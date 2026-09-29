@@ -1,0 +1,8 @@
+{
+  "camera": "Powerleague Battersea, corner camera behind the near goal (Quarter Pro footage)",
+  "note": "Goal mouths in 1920x1080 pixel coordinates. One-time calibration per fixed camera.",
+  "goals": [
+    { "end": "far",  "polygon": [[1072, 88], [1222, 88], [1228, 172], [1066, 172]] },
+    { "end": "near", "polygon": [[36, 478], [530, 466], [570, 1080], [0, 1080]] }
+  ]
+}

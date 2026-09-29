@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #08090a;
+  --color-surface: #131416;
+  --color-surface-2: #1c1d20;
+  --color-line: #26282c;
+  --color-ink: #f4f4f2;
+  --color-muted: #8b8f96;
+  --color-accent: #c8ff3d;
+  --color-accent-ink: #0a0f00;
+  --color-blue: #3b82f6;
+  --color-orange: #f97316;
+  --font-display: var(--font-display), "Barlow Condensed", Impact, sans-serif;
+  --font-sans: var(--font-sans), Inter, system-ui, sans-serif;
+  --radius-card: 1.25rem;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+}
+
+.display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  font-weight: 700;
+}
+
+.snap-feed {
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+.snap-feed::-webkit-scrollbar {
+  display: none;
+}
+.snap-item {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.vimeo-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.pulse-soft {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
