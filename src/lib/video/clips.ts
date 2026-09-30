@@ -9,6 +9,7 @@ import { eventVisibleToPlayers, type Video } from "../domain/types";
 import { getStorage } from "../storage";
 import { ffmpegAvailable, renderClipFile, renderThumbnail } from "./render";
 import { klipFileOk } from "./files";
+import { processingMode } from "../worker/jobs";
 
 export function sourceFileFor(video: Video): string | null {
   const p = path.join(process.cwd(), "ai", "videos", `${video.externalId}.mp4`);
@@ -25,6 +26,7 @@ export function clipRenderStatus(matchId: string) {
     rendered: klips.filter((k) => klipFileOk(k)).length,
     sourceAvailable: !!(video && sourceFileFor(video)),
     ffmpeg: ffmpegAvailable(),
+    viaWorker: processingMode() === "worker",
   };
 }
 

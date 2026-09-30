@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { Klip } from "../domain/types";
+import { mediaRoot } from "../storage";
 
 /**
  * Is this KLIP's rendered MP4 actually available? Local media lives in public/media and is not
@@ -12,5 +13,5 @@ export function klipFileOk(k: Klip): boolean {
   if (/^https?:\/\//.test(k.clipUrl) && !k.clipUrl.includes("localhost")) return true;
   const rel = k.clipUrl.replace(/^https?:\/\/[^/]+/, "");
   if (!rel.startsWith("/media/")) return true;
-  return fs.existsSync(path.join(process.cwd(), "public", rel));
+  return fs.existsSync(path.join(mediaRoot(), rel.slice("/media/".length)));
 }

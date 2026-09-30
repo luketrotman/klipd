@@ -2,38 +2,35 @@ import fs from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { getViewer } from "@/lib/auth/session";
-import { getDb } from "@/lib/db/store";
+import { DATA_DIR, getDb } from "@/lib/db/store";
 
 /**
  * Detected boxes at a moment of a video, for the labelling overlay.
  * GET /api/detections/<videoId>?t=123.4  →  { t, width, height, players: [...], ball }
- * Reads the cached detection pass (ai/output/<externalId>.detections.json) and the identity
- * mapping (ai/output/<externalId>.json). Admin only.
+ * Frames come from the worker's detection cache (DATA_DIR/detections/<id>.json, or ai/output locally);
+ * identities come from the database (tracked players and their tracker fragment ids). Admin only.
  */
 interface CachedFrame { t: number; p: number[][]; b: number[] | null }
-interface Cache { frames: CachedFrame[]; size: [number, number]; labelOfTrack: Map<number, string>; teamOfLabel: Map<string, number>; mtime: number }
+interface Cache { frames: CachedFrame[]; size: [number, number]; mtime: number }
 
 const g = globalThis as unknown as { __klipdDet?: Map<string, Cache> };
 if (!g.__klipdDet) g.__klipdDet = new Map();
 
+function detectionFile(externalId: string): string | null {
+  const a = path.join(DATA_DIR, "detections", `${externalId}.json`);
+  if (fs.existsSync(a)) return a;
+  const b = path.join(process.cwd(), "ai", "output", `${externalId}.detections.json`);
+  return fs.existsSync(b) ? b : null;
+}
+
 function load(externalId: string): Cache | null {
-  const detPath = path.join(process.cwd(), "ai", "output", `${externalId}.detections.json`);
-  const outPath = path.join(process.cwd(), "ai", "output", `${externalId}.json`);
-  if (!fs.existsSync(detPath)) return null;
-  const mtime = fs.statSync(detPath).mtimeMs + (fs.existsSync(outPath) ? fs.statSync(outPath).mtimeMs : 0);
+  const file = detectionFile(externalId);
+  if (!file) return null;
+  const mtime = fs.statSync(file).mtimeMs;
   const hit = g.__klipdDet!.get(externalId);
   if (hit && hit.mtime === mtime) return hit;
-  const det = JSON.parse(fs.readFileSync(detPath, "utf8")) as { frames: CachedFrame[]; size: [number, number] };
-  const labelOfTrack = new Map<number, string>();
-  const teamOfLabel = new Map<string, number>();
-  if (fs.existsSync(outPath)) {
-    const out = JSON.parse(fs.readFileSync(outPath, "utf8")) as { tracked: Array<{ label: string; team: number; trackIds?: number[] }> };
-    for (const t of out.tracked) {
-      teamOfLabel.set(t.label, t.team);
-      for (const id of t.trackIds ?? []) labelOfTrack.set(id, t.label);
-    }
-  }
-  const cache = { frames: det.frames, size: det.size, labelOfTrack, teamOfLabel, mtime };
+  const det = JSON.parse(fs.readFileSync(file, "utf8")) as { frames: CachedFrame[]; size: [number, number] };
+  const cache = { frames: det.frames, size: det.size, mtime };
   g.__klipdDet!.set(externalId, cache);
   return cache;
 }
@@ -60,12 +57,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ videoId:
   const f = cand.sort((a, b) => Math.abs(a.t - t) - Math.abs(b.t - t))[0];
   const tracked = db.trackedPlayers.filter((x) => x.matchId === video.matchId);
   const links = db.playerLinks;
+  const trackToTracked = new Map<number, (typeof tracked)[number]>();
+  for (const tp of tracked) for (const id of tp.trackIds ?? []) trackToTracked.set(id, tp);
   const players = f.p.map(([trackId, x1, y1, x2, y2, conf]) => {
-    const label = cache.labelOfTrack.get(trackId) ?? null;
-    const tp = label ? tracked.find((x) => x.label === label) ?? null : null;
+    const tp = trackToTracked.get(trackId) ?? null;
+    const label = tp?.label ?? null;
     const link = tp ? links.find((l) => l.trackedPlayerId === tp.id) : null;
     const profile = link ? db.playerProfiles.find((p) => p.id === link.playerId) : null;
-    return { trackId, label, trackedPlayerId: tp?.id ?? null, team: label ? cache.teamOfLabel.get(label) ?? null : null, x1, y1, x2, y2, conf, linkedName: profile?.displayName ?? null, linkedPlayerId: profile?.id ?? null };
+    return { trackId, label, trackedPlayerId: tp?.id ?? null, team: tp ? (tp.team === "HOME" ? 0 : tp.team === "AWAY" ? 1 : null) : null, x1, y1, x2, y2, conf, linkedName: profile?.displayName ?? null, linkedPlayerId: profile?.id ?? null };
   });
   return NextResponse.json({ t: f.t, width: cache.size[0], height: cache.size[1], players, ball: f.b, available: true });
 }

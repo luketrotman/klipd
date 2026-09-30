@@ -833,7 +833,8 @@
         "10 KLIP files rendered",
         "20 KLIP files rendered",
         "30 KLIP files rendered",
-        "Clip rendering finished: 38 files"
+        "Clip rendering finished: 38 files",
+        "Render job queued for the processing worker"
       ]
     }
   ],
@@ -19378,5 +19379,7 @@
       "createdAt": "2026-09-23T09:02:50.553Z"
     }
   ],
-  "authNonces": []
+  "authNonces": [],
+  "pushSubscriptions": [],
+  "workerJobs": []
 }

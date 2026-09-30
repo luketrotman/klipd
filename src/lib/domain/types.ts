@@ -308,6 +308,8 @@ export interface WorkerJob {
   error?: string | null;
   /** RENDER: klips to cut. */
   klipIds?: ID[];
+  /** PROCESS: analyse only the first N seconds (quick test). */
+  params?: { duration?: number };
 }
 
 export interface Database {
@@ -404,8 +406,8 @@ export const STATUS_COPY: Record<MatchStatus, { title: string; detail: string }>
 /**
  * The product's trust rule: what a player is allowed to see.
  * Demo labels are always visible (seeded product demo). Everything else waits for the match
- * to be published, or for AUTO mode. AI calls need a human "correct" unless AUTO mode
- * lets confident, unreviewed calls through.
+ * to be published, or for AUTO mode. Human-verified moments (MANUAL, including the copy made when a
+ * reviewer confirms an AI call) are visible; AI calls are visible only in AUTO mode while unreviewed.
  */
 export function eventVisibleToPlayers(event: MatchEvent, match: Match): boolean {
   if (event.metadata.demo === true) return true;
@@ -413,9 +415,8 @@ export function eventVisibleToPlayers(event: MatchEvent, match: Match): boolean 
   const released = !!match.publishedAt || mode === "AUTO";
   if (!released) return false;
   if (event.source === "MANUAL") return true;
-  const review = event.metadata.review as string | undefined;
-  if (review === "correct") return true;
-  if (review) return false; // wrong / wrong_player / wrong_type
+  // A reviewed AI call is replaced by its verified copy (a MANUAL event with its own KLIP), or rejected.
+  if (event.metadata.review) return false;
   return mode === "AUTO" && event.confidence >= (match.autoThreshold ?? 0.6);
 }
 

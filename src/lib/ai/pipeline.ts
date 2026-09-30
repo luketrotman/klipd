@@ -21,7 +21,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function setStage(matchId: string, stage: MatchStatus, engine: AiEngine["name"], log: string[] = []) {
   mutate((db) => {
     const m = db.matches.find((x) => x.id === matchId);
-    if (m) m.status = stage;
+    // A published match keeps its READY status while it is re-analysed, so players never lose sight of it.
+    if (m && !(m.publishedAt && stage !== "READY")) m.status = stage;
     const open = db.processingJobs.find((j) => j.matchId === matchId && !j.completedAt);
     if (open) open.completedAt = nowIso();
     if (STAGES.includes(stage)) {
@@ -195,4 +196,13 @@ export async function runProcessingPipeline(matchId: string, opts: { engine?: Ai
     setStage(matchId, "FAILED", engine.name, [String(err)]);
     throw err;
   }
+}
+
+/** Apply a CV result produced elsewhere (a worker) to a match: tracked players, events and KLIPs. */
+export async function ingestCvOutput(matchId: string, output: import("./local").CvOutput) {
+  const { LocalCvEngine } = await import("./local");
+  const match = getDb().matches.find((m) => m.id === matchId);
+  if (!match) throw new Error("Match not found");
+  const engine = new LocalCvEngine({ perTeam: playersPerTeam(match.format), preloaded: output });
+  await runProcessingPipeline(matchId, { engine, stepDelayMs: 0, renderClips: false });
 }

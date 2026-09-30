@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.env*
+data
+ai/videos
+ai/.venv
+ai/debug
+ai/output
+public/media
+*.md

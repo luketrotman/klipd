@@ -1,10 +1,16 @@
 /**
  * StorageProvider: where rendered clip files and thumbnails live.
- * Local (default): public/media/<key>, served by Next at /media/<key>.
+ * Local (default): <DATA_DIR>/media/<key>, served by the app at /media/<key>.
  * Production: an S3/R2 provider with the same interface (set STORAGE_PROVIDER=s3).
  */
 import fs from "node:fs";
 import path from "node:path";
+import { DATA_DIR } from "../db/store";
+
+/** Rendered clips and thumbnails live here (a persistent volume in production) and are served at /media/*. */
+export function mediaRoot(): string {
+  return process.env.MEDIA_DIR ?? path.join(DATA_DIR, "media");
+}
 
 export interface StorageProvider {
   readonly key: string;
@@ -18,7 +24,7 @@ export interface StorageProvider {
 
 class LocalStorage implements StorageProvider {
   readonly key = "local";
-  private root = path.join(process.cwd(), "public", "media");
+  private root = mediaRoot();
   localPathFor(destKey: string) {
     const p = path.join(this.root, destKey);
     fs.mkdirSync(path.dirname(p), { recursive: true });

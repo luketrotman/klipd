@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "vapid": "node -e \"const w=require('web-push');const k=w.generateVAPIDKeys();console.log('VAPID_PUBLIC_KEY='+k.publicKey+'\\nVAPID_PRIVATE_KEY='+k.privateKey)\""
   },
   "dependencies": {
     "@vimeo/player": "^2.30.4",
     "next": "^15.5.26",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
@@ -21,6 +23,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/vimeo__player": "^2.18.3",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "^15.5.26",
     "tailwindcss": "^4",

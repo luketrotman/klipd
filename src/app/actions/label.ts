@@ -92,6 +92,10 @@ export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, cor
     const twin = newId("evt");
     db.events.push({ id: twin, matchId: e.matchId, videoId: e.videoId, type, timestamp: e.timestamp, startTime: e.startTime, endTime: e.endTime, confidence: 1, team: e.team, source: "MANUAL", metadata: { labeller: "review", fromEventId: eventId, labelledAt: nowIso() }, createdAt: nowIso() });
     db.eventPlayers.push({ id: newId("evp"), eventId: twin, playerId, trackedPlayerId, role: "PRIMARY" });
+    // Keep the assist link when the AI credited one, so a confirmed goal keeps its assister.
+    for (const ep of db.eventPlayers.filter((x) => x.eventId === eventId && x.role !== "PRIMARY")) db.eventPlayers.push({ id: newId("evp"), eventId: twin, playerId: ep.playerId, trackedPlayerId: ep.trackedPlayerId, role: ep.role });
+    const src = db.klips.find((k) => k.eventId === eventId);
+    if (src) db.klips.push({ id: newId("klip"), matchId: e.matchId, eventId: twin, videoId: src.videoId, startTime: src.startTime, endTime: src.endTime, title: null, status: src.status, clipUrl: src.clipUrl, thumbnailUrl: src.thumbnailUrl, createdAt: nowIso() });
     return twin;
   });
   revalidatePath("/", "layout");
@@ -126,9 +130,8 @@ export async function publishMatch(matchId: string) {
     return out;
   });
   // Render MP4 files for everything players can now see (background; virtual clips play meanwhile).
-  const { renderKlipsForMatch, logToMatch, sourceFileFor } = await import("@/lib/video/clips");
-  const vid = getDb().videos.find((v) => v.matchId === matchId);
-  if (vid && sourceFileFor(vid)) void renderKlipsForMatch(matchId, { log: (msg) => logToMatch(matchId, msg) }).catch(() => {});
+  const { renderOrQueue } = await import("@/lib/worker/jobs");
+  await renderOrQueue(matchId).catch(() => {});
   const db = getDb();
   const m = db.matches.find((x) => x.id === matchId)!;
   await Promise.all(targets.map((t) => sendPushToUser(t.userId, { title: t.count ? "Your KLIPs are ready" : "Your game is up", body: `${m.title} · ${t.count ? `${t.count} moments` : "highlights"}`, url: `/matches/${matchId}` }).catch(() => {})));

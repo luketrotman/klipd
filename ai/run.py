@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import sys
 import time
 from collections import defaultdict
@@ -33,6 +34,10 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+
+
+if sys.version_info < (3, 10):
+    sys.exit("KLIPD CV pipeline needs Python 3.10+ (DINOv2 requires it). Recreate ai/.venv with a newer Python.")
 
 
 def log(stage: str, msg: str, **extra):
@@ -864,6 +869,11 @@ def main():
             c["colours"] = {str(k): [list(map(float, v)) for v in vs] for k, vs in colours.items()}
             cache.write_text(json.dumps(c))
     else:
+        here = Path(__file__).resolve().parent
+        if not Path(args.model).exists() and (here / args.model).exists():
+            args.model = str(here / args.model)
+        elif not Path(args.model).exists():
+            os.chdir(here)  # first run: weights download next to the pipeline, not into the project root
         model = YOLO(args.model)
         log("PLAYER_DETECTION", f"model {args.model} imgsz {args.imgsz} device {args.device} sampling {args.fps} fps")
         frames, colours, stats, vfps, size = run_detection(args, cap, model, pitch, pitch_d)

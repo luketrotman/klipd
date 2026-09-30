@@ -50,9 +50,11 @@ ai/labels/*_crops/
 data/db.json.tmp
 
 # Labelled ground truth and cached detections ARE committed on purpose (data/db.json, ai/output/)
-public/media/
+data/media/
 
 # secrets: never commit
 data/.auth-secret
 .env*
 *.pem
+!.env.example
+*.pt

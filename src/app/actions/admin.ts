@@ -6,10 +6,11 @@ import { getDb, mutate, newId, nowIso, resetDb } from "@/lib/db/store";
 import { EVENT_TYPES, type EventType, type Team, type MatchFormat } from "@/lib/domain/types";
 import { appendJobLog, playersPerTeam, runProcessingPipeline } from "@/lib/ai/pipeline";
 import { LocalCvEngine, localCvAvailable } from "@/lib/ai/local";
+import { enqueueProcess, processingMode, renderOrQueue } from "@/lib/worker/jobs";
 import { getVideoProvider } from "@/lib/video";
 import { VimeoVideoProvider } from "@/lib/video/vimeo";
 import { providerFor } from "@/lib/video";
-import { clipRenderStatus, logToMatch, renderKlipsForMatch } from "@/lib/video/clips";
+import { clipRenderStatus, logToMatch } from "@/lib/video/clips";
 
 export interface EventInput {
   matchId: string;
@@ -112,6 +113,12 @@ export async function setMatchScore(matchId: string, home: number, away: number)
 
 /** Kick off processing. Runs in the background; the UI polls status. */
 export async function startProcessing(matchId: string, engineKey: "MOCK" | "LOCAL_CV" = "MOCK", opts: { duration?: number } = {}) {
+  if (engineKey === "LOCAL_CV" && processingMode() === "worker") {
+    enqueueProcess(matchId, { duration: opts.duration });
+    appendJobLog(matchId, "Queued for the processing worker");
+    revalidatePath("/", "layout");
+    return;
+  }
   if (engineKey === "LOCAL_CV") {
     if (!localCvAvailable()) throw new Error("Local CV environment is not set up (ai/.venv).");
     const match = getDb().matches.find((m) => m.id === matchId);
@@ -204,10 +211,8 @@ export async function refreshVideoMetadata(videoId: string) {
 
 /** Render MP4 files (with watermark) for every KLIP of a match that is still virtual. Background. */
 export async function startClipRendering(matchId: string) {
-  const st = clipRenderStatus(matchId);
-  if (!st.sourceAvailable) throw new Error("Source footage is not on this machine (ai/videos/<id>.mp4)");
-  if (!st.ffmpeg) throw new Error("ffmpeg is not installed");
-  void renderKlipsForMatch(matchId, { log: (m) => logToMatch(matchId, m) }).catch((err) => logToMatch(matchId, `Rendering failed: ${err instanceof Error ? err.message : String(err)}`));
+  const how = await renderOrQueue(matchId);
+  if (how === "queued") logToMatch(matchId, "Render job queued for the processing worker");
   revalidatePath("/", "layout");
 }
 

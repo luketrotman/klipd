@@ -18,7 +18,7 @@ Then, once only, the Python environment for the CV pipeline (it is not portable,
 recreated rather than copied):
 
 ```bash
-python3 -m venv --system-site-packages ai/.venv && ai/.venv/bin/pip install ultralytics opencv-python-headless numpy yt-dlp
+python3.13 -m venv --system-site-packages ai/.venv && ai/.venv/bin/pip install ultralytics opencv-python-headless numpy yt-dlp
 ```
 
 Open http://localhost:3000. Sign in as **Luke Trotman** from the demo list on `/login`
@@ -36,7 +36,7 @@ ball possession, and rule-based events (shots, goal candidates, saves, assists, 
 passes, dribbles, tackles, interceptions) with confidences.
 
 ```bash
-python3 -m venv --system-site-packages ai/.venv     # needs a torch install; MPS on Apple Silicon
+python3.13 -m venv --system-site-packages ai/.venv     # Python 3.10 or newer; torch with MPS on Apple Silicon
 ai/.venv/bin/pip install ultralytics opencv-python-headless numpy yt-dlp
 ```
 
@@ -69,6 +69,13 @@ centre spot that follows every goal in small sided football. Identity is the wea
 tracker splits each player into roughly two identities per match, so a player claims each one
 ("That's me"). Appearance re-identification is the next model to add. Accuracy is unmeasured
 until games are labelled in the editor; `ai/evaluate.py` scores AI events against those labels.
+
+## Going live
+
+`docs/DEPLOY.md` (Fly.io + Resend + worker) and `docs/PILOT.md` (running a game). Product controls in
+place: publish gate (players only see approved moments), signed sessions with emailed one-time links,
+web push, installable app (PWA), watermarked MP4 clips, and a worker API so the hosted app never needs
+a GPU. `.env.example` lists every setting.
 
 ## Training interface
 

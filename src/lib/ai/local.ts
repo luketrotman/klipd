@@ -14,7 +14,7 @@ import path from "node:path";
 import type { EventType, MatchStatus, Team, Video } from "../domain/types";
 import type { AiEngine, DetectedEvent, DetectedPlayer, GeneratedClip, IdentitySuggestion, TrackedPlayerResult } from "./services";
 
-interface CvOutput {
+export interface CvOutput {
   engine: string;
   stats: Record<string, unknown>;
   teams: Array<{ index: number; colour: string }>;
@@ -32,6 +32,8 @@ export interface LocalCvOptions {
   duration?: number;
   start?: number;
   debugFrames?: number;
+  /** Use this CV output instead of running the Python pipeline (results uploaded by a remote worker). */
+  preloaded?: CvOutput;
   onLog?: (stage: MatchStatus, msg: string, progress?: number) => void;
 }
 
@@ -94,6 +96,7 @@ export class LocalCvEngine implements AiEngine {
   }
 
   private run(video: Video): Promise<CvOutput> {
+    if (this.opts.preloaded) return Promise.resolve(this.opts.preloaded);
     const key = `${video.externalId}:${this.opts.start ?? 0}:${this.opts.duration ?? 0}`;
     let p = this.runs.get(key);
     if (!p) {

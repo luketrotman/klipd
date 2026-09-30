@@ -21,7 +21,7 @@ export default function PublishPanel({ matchId, summary, players }: { matchId: s
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-bg p-2"><div className="display text-2xl">{summary.reviewed}/{summary.ai}</div><div className="text-[10px] uppercase tracking-wider text-muted">AI reviewed</div></div>
-        <div className="rounded-xl bg-bg p-2"><div className="display text-2xl">{summary.approved + summary.manual}</div><div className="text-[10px] uppercase tracking-wider text-muted">Verified moments</div></div>
+        <div className="rounded-xl bg-bg p-2"><div className="display text-2xl">{summary.manual}</div><div className="text-[10px] uppercase tracking-wider text-muted">Verified moments</div></div>
         <div className="rounded-xl bg-bg p-2"><div className="display text-2xl">{summary.visibleToPlayers}</div><div className="text-[10px] uppercase tracking-wider text-muted">Players see</div></div>
       </div>
       <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-accent" style={{ width: `${pct}%` }} /></div>

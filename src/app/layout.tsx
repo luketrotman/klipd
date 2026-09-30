@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Inter } from "next/font/google";
 import "./globals.css";
+import PwaRegister from "@/components/PwaRegister";
 
 const display = Barlow_Condensed({ weight: ["600", "700", "800"], subsets: ["latin"], variable: "--font-display" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
   title: { default: "KLIPD", template: "%s · KLIPD" },
   description: "KLIPD automatically turns your 5 a side games into personal football highlights.",
   applicationName: "KLIPD",
+  appleWebApp: { capable: true, title: "KLIPD", statusBarStyle: "black-translucent" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -21,7 +24,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <PwaRegister />
+      </body>
     </html>
   );
 }

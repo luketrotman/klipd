@@ -22,7 +22,7 @@ export interface EditorEvent {
 
 interface Props {
   cvAvailable: boolean;
-  clips: { total: number; rendered: number; sourceAvailable: boolean; ffmpeg: boolean };
+  clips: { total: number; rendered: number; sourceAvailable: boolean; ffmpeg: boolean; viaWorker: boolean };
   /** Annotated frames from the local CV run, named <video>_<n>_<TYPE>_<sec>s.jpg */
   debugFrames: string[];
   match: Match;
@@ -356,8 +356,8 @@ export default function EventEditor({ cvAvailable, clips, debugFrames, match, vi
         <section className="rounded-2xl bg-surface p-4">
           <h2 className="display text-2xl mb-1">KLIP files</h2>
           <div className="text-sm">{clips.rendered} of {clips.total} rendered as MP4</div>
-          <p className="text-[11px] text-muted mt-1">{clips.sourceAvailable ? "Source footage is on this machine." : "Source footage not on this machine: download it to ai/videos/ first."}{!clips.ffmpeg ? " ffmpeg missing." : ""}</p>
-          <button disabled={pending || !clips.sourceAvailable || !clips.ffmpeg || clips.rendered >= clips.total} onClick={() => start(async () => { try { await startClipRendering(match.id); } catch (e) { setError(e instanceof Error ? e.message : String(e)); } router.refresh(); })} className="mt-3 h-10 w-full rounded-full border border-accent text-accent text-sm font-bold disabled:opacity-40">
+          <p className="text-[11px] text-muted mt-1">{clips.viaWorker ? "Rendering is queued for the processing worker." : clips.sourceAvailable ? "Source footage is on this machine." : "Source footage not on this machine: download it to ai/videos/ first."}{!clips.viaWorker && !clips.ffmpeg ? " ffmpeg missing." : ""}</p>
+          <button disabled={pending || (!clips.viaWorker && (!clips.sourceAvailable || !clips.ffmpeg)) || clips.rendered >= clips.total} onClick={() => start(async () => { try { await startClipRendering(match.id); } catch (e) { setError(e instanceof Error ? e.message : String(e)); } router.refresh(); })} className="mt-3 h-10 w-full rounded-full border border-accent text-accent text-sm font-bold disabled:opacity-40">
             Render {clips.total - clips.rendered} KLIP files
           </button>
         </section>

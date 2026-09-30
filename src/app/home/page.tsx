@@ -8,6 +8,7 @@ import { Button, SectionTitle, StatRow, formatKickoff } from "@/components/ui";
 import KlipGrid from "@/components/KlipGrid";
 import ProcessingStatus from "@/components/ProcessingStatus";
 import CheckingCard from "@/components/CheckingCard";
+import PushPrompt from "@/components/PushPrompt";
 import { MatchRow } from "@/components/MatchRow";
 import { markNotificationsRead } from "@/app/actions/klips";
 
@@ -83,6 +84,10 @@ export default async function Home() {
         <section className="mt-8">
           <SectionTitle action="See all" href="/profile">Your latest KLIPs</SectionTitle>
           <KlipGrid cards={recent} cols={3} />
+        </section>
+
+        <section className="mt-8 px-4">
+          <PushPrompt />
         </section>
 
         <section className="mt-8 px-4">

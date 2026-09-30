@@ -227,9 +227,26 @@ def cluster_identities(fragments, embeddings, per_team: int, tau: float | None =
                 idx = clusters.index(best)
                 clusters[idx] = merge(best, c)
                 attached += 1
+        # Cap: a team has per_team players plus a few subs. Beyond that, keep merging the most similar
+        # pair that is never seen in two places at once. The physical constraint still protects
+        # against merging different people who are on the pitch together.
+        cap_n = per_team + max_extra
+        forced = 0
+        while len(clusters) > cap_n:
+            best, best_s = None, -9.0
+            for i in range(len(clusters)):
+                for j in range(i + 1, len(clusters)):
+                    s_ = sim(clusters[i], clusters[j])
+                    if s_ > best_s and not _conflict(clusters[i], clusters[j]):
+                        best, best_s = (i, j), s_
+            if best is None:
+                break
+            i, j = best
+            clusters = [c for k, c in enumerate(clusters) if k not in (i, j)] + [merge(clusters[i], clusters[j])]
+            forced += 1
         clusters.sort(key=lambda c: -c["dur"])
         if log:
-            log("PLAYER_TRACKING", f"team {team}: {len(clusters)} identities, {attached}/{len(short_fr)} short fragments attached")
+            log("PLAYER_TRACKING", f"team {team}: {len(clusters)} identities, {attached}/{len(short_fr)} short fragments attached, {forced} merged to respect the roster size")
         for c in clusters:
             players.append({"team": team, "frags": c["frags"], "colour": c["colour"], "dur": c["dur"], "end": max(f["end"] for f in c["frags"]), "last": (0, 0, 1), "embedding": mean_emb(c)})
     return players
