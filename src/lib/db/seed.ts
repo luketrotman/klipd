@@ -2,8 +2,8 @@
  * Seed data for the KLIPD MVP.
  *
  * Three real Vimeo recordings of small sided games are treated as KLIPD matches.
- * Events on matches 1 and 2 are MANUAL labels (the kind an admin creates in the
- * event editor). Match 3 is mid-pipeline to exercise the processing UI.
+ * Events on matches 1 and 2 are hand-written demo labels. Match 3 has footage recorded and is
+ * waiting for analysis (run the pipeline from the admin match page).
  *
  * Timestamps are seconds into each video.
  */
@@ -317,7 +317,7 @@ function buildDemoSeed(): Database {
       kickoffAt: "2026-09-21T17:30:00.000Z",
       durationMinutes: 40,
       format: "6v6" as const,
-      status: "GENERATING_KLIPS" as const,
+      status: "UPLOADED" as const,
       homeTeam: { name: "Blue", colour: "#3b82f6" },
       awayTeam: { name: "Orange", colour: "#f97316" },
       score: null,
@@ -352,20 +352,10 @@ function buildDemoSeed(): Database {
     },
   ];
 
-  const m3Jobs = (["UPLOADED", "PROCESSING", "PLAYER_DETECTION", "PLAYER_TRACKING", "EVENT_DETECTION", "GENERATING_KLIPS"] as const).map((stage, i) => ({
-    id: `job_sun6s_${i}`,
-    matchId: m3,
-    stage,
-    engine: "MOCK" as const,
-    startedAt: new Date(Date.parse("2026-09-21T18:12:00.000Z") + i * 60_000).toISOString(),
-    completedAt: stage === "GENERATING_KLIPS" ? null : new Date(Date.parse("2026-09-21T18:12:00.000Z") + (i + 1) * 60_000).toISOString(),
-    log: [`${stage} started (MOCK engine)`],
-  }));
-
   const notifications = [
     {
       id: "notif_1", userId: "user_luke", type: "KLIPS_READY" as const,
-      title: "Your KLIPs are ready", body: "Thursday 5s · Powerleague Battersea · 9 moments found",
+      title: "Your KLIPs are ready", body: "Thursday 5s · Powerleague Battersea",
       matchId: m2, read: false, createdAt: "2026-09-17T21:16:00.000Z",
     },
     {
@@ -402,7 +392,7 @@ function buildDemoSeed(): Database {
     matches,
     matchPlayers: [...roster(m1, m1Home, m1Away), ...roster(m2, m2Home, m2Away), ...roster(m3, m3Home, m3Away)],
     videos,
-    processingJobs: m3Jobs,
+    processingJobs: [],
     trackedPlayers: m2Tracked,
     playerLinks: m2Links,
     events: [...m1Built.events, ...m2Built.events],

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { assertAdmin } from "@/lib/auth/admin";
 import { getDb, mutate, newId, nowIso, resetDb } from "@/lib/db/store";
 import { EVENT_TYPES, type EventType, type Team, type MatchFormat } from "@/lib/domain/types";
 import { appendJobLog, playersPerTeam, runProcessingPipeline } from "@/lib/ai/pipeline";
@@ -10,7 +11,7 @@ import { enqueueProcess, processingMode, renderOrQueue } from "@/lib/worker/jobs
 import { getVideoProvider } from "@/lib/video";
 import { VimeoVideoProvider } from "@/lib/video/vimeo";
 import { providerFor } from "@/lib/video";
-import { clipRenderStatus, logToMatch } from "@/lib/video/clips";
+import { logToMatch } from "@/lib/video/clips";
 
 export interface EventInput {
   matchId: string;
@@ -35,6 +36,7 @@ function validate(input: EventInput) {
 }
 
 export async function saveEvent(input: EventInput, eventId?: string) {
+  await assertAdmin();
   validate(input);
   const id = mutate((db) => {
     const match = db.matches.find((m) => m.id === input.matchId);
@@ -71,6 +73,7 @@ export async function saveEvent(input: EventInput, eventId?: string) {
 }
 
 export async function deleteEvent(eventId: string) {
+  await assertAdmin();
   mutate((db) => {
     db.events = db.events.filter((e) => e.id !== eventId);
     db.eventPlayers = db.eventPlayers.filter((ep) => ep.eventId !== eventId);
@@ -85,6 +88,7 @@ export async function deleteEvent(eventId: string) {
 
 /** Delete only the KLIP, keeping the labelled event. */
 export async function deleteKlip(klipId: string) {
+  await assertAdmin();
   mutate((db) => {
     db.klips = db.klips.filter((k) => k.id !== klipId);
     db.klipLikes = db.klipLikes.filter((l) => l.klipId !== klipId);
@@ -95,6 +99,7 @@ export async function deleteKlip(klipId: string) {
 }
 
 export async function createKlipForEvent(eventId: string) {
+  await assertAdmin();
   mutate((db) => {
     const e = db.events.find((x) => x.id === eventId);
     if (!e || !e.videoId || db.klips.some((k) => k.eventId === eventId)) return;
@@ -104,6 +109,7 @@ export async function createKlipForEvent(eventId: string) {
 }
 
 export async function setMatchScore(matchId: string, home: number, away: number) {
+  await assertAdmin();
   mutate((db) => {
     const m = db.matches.find((x) => x.id === matchId);
     if (m) m.score = { home, away };
@@ -113,6 +119,7 @@ export async function setMatchScore(matchId: string, home: number, away: number)
 
 /** Kick off processing. Runs in the background; the UI polls status. */
 export async function startProcessing(matchId: string, engineKey: "MOCK" | "LOCAL_CV" = "MOCK", opts: { duration?: number } = {}) {
+  await assertAdmin();
   if (engineKey === "LOCAL_CV" && processingMode() === "worker") {
     enqueueProcess(matchId, { duration: opts.duration });
     appendJobLog(matchId, "Queued for the processing worker");
@@ -136,11 +143,9 @@ export async function startProcessing(matchId: string, engineKey: "MOCK" | "LOCA
   revalidatePath("/", "layout");
 }
 
-export async function localCvStatus() {
-  return { available: localCvAvailable() };
-}
 
 export async function createMatch(formData: FormData) {
+  await assertAdmin();
   const title = String(formData.get("title") ?? "").trim();
   const venueId = String(formData.get("venueId") ?? "");
   const pitchId = String(formData.get("pitchId") ?? "");
@@ -188,12 +193,15 @@ export async function createMatch(formData: FormData) {
 }
 
 export async function resetSeedData() {
+  await assertAdmin();
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_RESET !== "1") throw new Error("Reset is disabled in production");
   resetDb();
   revalidatePath("/", "layout");
   redirect("/admin");
 }
 
 export async function refreshVideoMetadata(videoId: string) {
+  await assertAdmin();
   const db = getDb();
   const video = db.videos.find((v) => v.id === videoId);
   if (!video) return;
@@ -211,21 +219,19 @@ export async function refreshVideoMetadata(videoId: string) {
 
 /** Render MP4 files (with watermark) for every KLIP of a match that is still virtual. Background. */
 export async function startClipRendering(matchId: string) {
+  await assertAdmin();
   const how = await renderOrQueue(matchId);
   if (how === "queued") logToMatch(matchId, "Render job queued for the processing worker");
   revalidatePath("/", "layout");
 }
 
-export async function getClipRenderStatus(matchId: string) {
-  return clipRenderStatus(matchId);
-}
 
 /* ---------------- roster / players ---------------- */
 
 export interface RosterLine { name: string; email: string | null; team: Team | null }
 
 /** Parse pasted roster text. One player per line: `Name, email, H|A` (email and team optional). */
-export async function parseRoster(text: string): Promise<RosterLine[]> {
+async function parseRoster(text: string): Promise<RosterLine[]> {
   return text
     .split(/\r?\n/)
     .map((l) => l.trim())
@@ -259,6 +265,7 @@ function upsertProfile(db: import("@/lib/domain/types").Database, r: RosterLine)
 }
 
 export async function addPlayers(formData: FormData) {
+  await assertAdmin();
   const lines = await parseRoster(String(formData.get("roster") ?? ""));
   if (!lines.length) throw new Error("Add at least one player");
   mutate((db) => { for (const r of lines) upsertProfile(db, r); });

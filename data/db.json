@@ -265,7 +265,8 @@
       "videoId": "video_thu5s",
       "createdAt": "2026-09-16T10:00:00.000Z",
       "publishedAt": "2026-09-17T21:15:00.000Z",
-      "publishMode": "REVIEWED"
+      "publishMode": "REVIEWED",
+      "autoThreshold": 0.6
     },
     {
       "id": "match_sun6s",
@@ -278,7 +279,7 @@
       "kickoffAt": "2026-09-21T17:30:00.000Z",
       "durationMinutes": 40,
       "format": "6v6",
-      "status": "GENERATING_KLIPS",
+      "status": "UPLOADED",
       "homeTeam": {
         "name": "Blue",
         "colour": "#3b82f6"
@@ -593,72 +594,6 @@
     }
   ],
   "processingJobs": [
-    {
-      "id": "job_sun6s_0",
-      "matchId": "match_sun6s",
-      "stage": "UPLOADED",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:12:00.000Z",
-      "completedAt": "2026-09-21T18:13:00.000Z",
-      "log": [
-        "UPLOADED started (MOCK engine)"
-      ]
-    },
-    {
-      "id": "job_sun6s_1",
-      "matchId": "match_sun6s",
-      "stage": "PROCESSING",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:13:00.000Z",
-      "completedAt": "2026-09-21T18:14:00.000Z",
-      "log": [
-        "PROCESSING started (MOCK engine)"
-      ]
-    },
-    {
-      "id": "job_sun6s_2",
-      "matchId": "match_sun6s",
-      "stage": "PLAYER_DETECTION",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:14:00.000Z",
-      "completedAt": "2026-09-21T18:15:00.000Z",
-      "log": [
-        "PLAYER_DETECTION started (MOCK engine)"
-      ]
-    },
-    {
-      "id": "job_sun6s_3",
-      "matchId": "match_sun6s",
-      "stage": "PLAYER_TRACKING",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:15:00.000Z",
-      "completedAt": "2026-09-21T18:16:00.000Z",
-      "log": [
-        "PLAYER_TRACKING started (MOCK engine)"
-      ]
-    },
-    {
-      "id": "job_sun6s_4",
-      "matchId": "match_sun6s",
-      "stage": "EVENT_DETECTION",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:16:00.000Z",
-      "completedAt": "2026-09-21T18:17:00.000Z",
-      "log": [
-        "EVENT_DETECTION started (MOCK engine)"
-      ]
-    },
-    {
-      "id": "job_sun6s_5",
-      "matchId": "match_sun6s",
-      "stage": "GENERATING_KLIPS",
-      "engine": "MOCK",
-      "startedAt": "2026-09-21T18:17:00.000Z",
-      "completedAt": null,
-      "log": [
-        "GENERATING_KLIPS started (MOCK engine)"
-      ]
-    },
     {
       "id": "job_6wtpw87",
       "matchId": "match_thu5s",
@@ -19163,7 +19098,7 @@
       "userId": "user_luke",
       "type": "KLIPS_READY",
       "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 Powerleague Battersea \u00b7 9 moments found",
+      "body": "Thursday 5s \u00b7 Powerleague Battersea",
       "matchId": "match_thu5s",
       "read": false,
       "createdAt": "2026-09-17T21:16:00.000Z"
@@ -19177,206 +19112,6 @@
       "matchId": "match_sun6s",
       "read": true,
       "createdAt": "2026-09-21T18:12:00.000Z"
-    },
-    {
-      "id": "notif_rn253nn",
-      "userId": "user_luke",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 201 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T01:40:01.359Z"
-    },
-    {
-      "id": "notif_2c337j8",
-      "userId": "user_james",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 201 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T01:40:01.359Z"
-    },
-    {
-      "id": "notif_c93vnsi",
-      "userId": "user_tom",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 201 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T01:40:01.359Z"
-    },
-    {
-      "id": "notif_hkx6yuj",
-      "userId": "user_ben",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 201 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T01:40:01.359Z"
-    },
-    {
-      "id": "notif_ypsdemb",
-      "userId": "user_luke",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 182 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T02:31:10.629Z"
-    },
-    {
-      "id": "notif_3zvrhwd",
-      "userId": "user_james",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 182 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T02:31:10.629Z"
-    },
-    {
-      "id": "notif_7czdujd",
-      "userId": "user_tom",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 182 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T02:31:10.629Z"
-    },
-    {
-      "id": "notif_pu8kzdx",
-      "userId": "user_ben",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 182 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T02:31:10.629Z"
-    },
-    {
-      "id": "notif_wdkfqm9",
-      "userId": "user_luke",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 186 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T08:58:15.264Z"
-    },
-    {
-      "id": "notif_k5av3m8",
-      "userId": "user_james",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 186 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T08:58:15.264Z"
-    },
-    {
-      "id": "notif_we3umqa",
-      "userId": "user_tom",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 186 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T08:58:15.264Z"
-    },
-    {
-      "id": "notif_w6dtzfx",
-      "userId": "user_ben",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 186 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T08:58:15.264Z"
-    },
-    {
-      "id": "notif_p97x6nf",
-      "userId": "user_luke",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 187 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:00:06.181Z"
-    },
-    {
-      "id": "notif_ztuvy4x",
-      "userId": "user_james",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 187 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:00:06.181Z"
-    },
-    {
-      "id": "notif_8xj97my",
-      "userId": "user_tom",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 187 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:00:06.181Z"
-    },
-    {
-      "id": "notif_g74bbqe",
-      "userId": "user_ben",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Thursday 5s \u00b7 187 moments found",
-      "matchId": "match_thu5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:00:06.181Z"
-    },
-    {
-      "id": "notif_vjexzix",
-      "userId": "user_luke",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 204 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:02:50.553Z"
-    },
-    {
-      "id": "notif_xxdxhty",
-      "userId": "user_james",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 204 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:02:50.553Z"
-    },
-    {
-      "id": "notif_8gyevf7",
-      "userId": "user_tom",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 204 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:02:50.553Z"
-    },
-    {
-      "id": "notif_d8eekzq",
-      "userId": "user_ben",
-      "type": "KLIPS_READY",
-      "title": "Your KLIPs are ready",
-      "body": "Tuesday 5s \u00b7 204 moments found",
-      "matchId": "match_tue5s",
-      "read": false,
-      "createdAt": "2026-09-23T09:02:50.553Z"
     }
   ],
   "authNonces": [],

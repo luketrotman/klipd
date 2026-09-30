@@ -181,17 +181,12 @@ export async function runProcessingPipeline(matchId: string, opts: { engine?: Ai
     await sleep(delay);
 
     setStage(matchId, "READY", engine.name);
-    // Notify every booked player with a linked user account.
-    mutate((d) => {
-      const m = d.matches.find((x) => x.id === matchId)!;
-      const count = d.klips.filter((k) => k.matchId === matchId).length;
-      for (const mp of d.matchPlayers.filter((x) => x.matchId === matchId)) {
-        const profile = d.playerProfiles.find((p) => p.id === mp.playerId);
-        if (profile?.userId) {
-          d.notifications.push({ id: newId("notif"), userId: profile.userId, type: "KLIPS_READY", title: "Your KLIPs are ready", body: `${m.title} · ${count} moments found`, matchId, read: false, createdAt: nowIso() });
-        }
-      }
-    });
+    // Players are told only once a person has checked the game and published it. Auto mode is the exception.
+    const finished = getDb().matches.find((x) => x.id === matchId);
+    if (finished && (finished.publishMode ?? "REVIEWED") === "AUTO" && !finished.publishedAt) {
+      const { releaseMatch } = await import("../publish");
+      await releaseMatch(matchId).catch((e) => appendJobLog(matchId, `Auto release failed: ${String(e)}`));
+    }
   } catch (err) {
     setStage(matchId, "FAILED", engine.name, [String(err)]);
     throw err;

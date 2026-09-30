@@ -77,6 +77,17 @@ place: publish gate (players only see approved moments), signed sessions with em
 web push, installable app (PWA), watermarked MP4 clips, and a worker API so the hosted app never needs
 a GPU. `.env.example` lists every setting.
 
+## Security notes
+
+- Every exported server action is a public HTTP endpoint, even if no page links to it. All admin actions
+  therefore start with `await assertAdmin()`, and `npm run check` fails the build if one does not
+  (`scripts/check-actions-auth.mjs`). Run `npm run check` before every deploy.
+- Verified against a running server: 19 admin actions rejected for anonymous callers and for signed-in
+  non-admin players, and accepted for the admin.
+- Players can only claim an unlinked player in a published game they are on the roster for, at most four
+  per game. Public view and share counters are de-duplicated so they cannot flood the database.
+- `resetSeedData` is refused in production unless `ALLOW_RESET=1`.
+
 ## Training interface
 
 `/admin/label/[matchId]` (or **Train** from the admin match list) is a hazard-perception style

@@ -50,6 +50,7 @@ fly secrets set \
 
 ### 4. Deploy
 ```bash
+npm run check    # authorization, types and lint must pass
 fly deploy
 ```
 Open `https://YOUR-APP.fly.dev/login`, enter the email in `ADMIN_EMAILS`, and click the link you receive. That account is the admin.

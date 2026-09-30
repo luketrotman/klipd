@@ -1,16 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getViewer } from "@/lib/auth/session";
+import { assertAdmin } from "@/lib/auth/admin";
 import { getDb, mutate, newId, nowIso } from "@/lib/db/store";
 import { EVENT_TYPES, type EventType } from "@/lib/domain/types";
 import { linkTrackedPlayer } from "./identity";
-
-async function requireAdmin() {
-  const v = await getViewer();
-  if (!v?.user.isAdmin) throw new Error("Admin only");
-  return v;
-}
 
 export interface QuickLabelInput {
   matchId: string;
@@ -25,7 +19,7 @@ export interface QuickLabelInput {
 
 /** One tap in the quick labeller: a verified human label (source MANUAL). */
 export async function saveQuickLabel(input: QuickLabelInput) {
-  await requireAdmin();
+  await assertAdmin();
   if (!EVENT_TYPES.includes(input.type)) throw new Error("Bad type");
   if (!input.trackedPlayerId && !input.playerId) throw new Error("Pick a player");
   const lead = input.lead ?? 8, tail = input.tail ?? 7;
@@ -50,7 +44,7 @@ export async function saveQuickLabel(input: QuickLabelInput) {
 }
 
 export async function deleteLabel(eventId: string) {
-  await requireAdmin();
+  await assertAdmin();
   mutate((db) => {
     const e = db.events.find((x) => x.id === eventId);
     if (!e || e.source !== "MANUAL") return;
@@ -67,7 +61,7 @@ export async function deleteLabel(eventId: string) {
 
 /** "Who is Player 07?" from the labeller: links a tracked identity to a roster player. */
 export async function identifyTracked(trackedPlayerId: string, playerId: string) {
-  await requireAdmin();
+  await assertAdmin();
   await linkTrackedPlayer(trackedPlayerId, playerId, "MANUAL");
 }
 
@@ -78,7 +72,7 @@ export type ReviewVerdict = "correct" | "wrong" | "wrong_player" | "wrong_type";
  * ground truth; "wrong" just marks the AI event rejected (kept for training as a negative).
  */
 export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, correction: { trackedPlayerId?: string | null; playerId?: string | null; type?: EventType } = {}) {
-  await requireAdmin();
+  await assertAdmin();
   const twinId = mutate((db) => {
     const e = db.events.find((x) => x.id === eventId);
     if (!e) throw new Error("No event");
@@ -104,43 +98,15 @@ export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, cor
 
 /** Release a game to its players: they get notified and can see approved moments. */
 export async function publishMatch(matchId: string) {
-  await requireAdmin();
-  const { eventVisibleToPlayers } = await import("@/lib/domain/types");
-  const { sendPushToUser } = await import("@/lib/push/server");
-  const targets = mutate((db) => {
-    const m = db.matches.find((x) => x.id === matchId);
-    if (!m) throw new Error("No match");
-    m.publishedAt = nowIso();
-    const visibleEvents = new Set(db.events.filter((e) => e.matchId === matchId && eventVisibleToPlayers(e, m)).map((e) => e.id));
-    const links = new Map(db.playerLinks.map((l) => [l.trackedPlayerId, l.playerId]));
-    const perPlayer = new Map<string, number>();
-    for (const ep of db.eventPlayers) {
-      if (!visibleEvents.has(ep.eventId) || ep.role !== "PRIMARY") continue;
-      const pid = ep.playerId ?? (ep.trackedPlayerId ? links.get(ep.trackedPlayerId) : null);
-      if (pid) perPlayer.set(pid, (perPlayer.get(pid) ?? 0) + 1);
-    }
-    const out: Array<{ userId: string; count: number }> = [];
-    for (const mp of db.matchPlayers.filter((x) => x.matchId === matchId)) {
-      const profile = db.playerProfiles.find((p) => p.id === mp.playerId);
-      if (!profile?.userId) continue;
-      const count = perPlayer.get(mp.playerId) ?? 0;
-      db.notifications.push({ id: newId("notif"), userId: profile.userId, type: "KLIPS_READY", title: count ? "Your KLIPs are ready" : "Your game is up", body: `${m.title} · ${count ? `${count} moments found` : "match highlights available"}`, matchId, read: false, createdAt: nowIso() });
-      out.push({ userId: profile.userId, count });
-    }
-    return out;
-  });
-  // Render MP4 files for everything players can now see (background; virtual clips play meanwhile).
-  const { renderOrQueue } = await import("@/lib/worker/jobs");
-  await renderOrQueue(matchId).catch(() => {});
-  const db = getDb();
-  const m = db.matches.find((x) => x.id === matchId)!;
-  await Promise.all(targets.map((t) => sendPushToUser(t.userId, { title: t.count ? "Your KLIPs are ready" : "Your game is up", body: `${m.title} · ${t.count ? `${t.count} moments` : "highlights"}`, url: `/matches/${matchId}` }).catch(() => {})));
+  await assertAdmin();
+  const { releaseMatch } = await import("@/lib/publish");
+  const n = await releaseMatch(matchId);
   revalidatePath("/", "layout");
-  return targets.length;
+  return n;
 }
 
 export async function unpublishMatch(matchId: string) {
-  await requireAdmin();
+  await assertAdmin();
   mutate((db) => {
     const m = db.matches.find((x) => x.id === matchId);
     if (m) m.publishedAt = null;
@@ -149,7 +115,7 @@ export async function unpublishMatch(matchId: string) {
 }
 
 export async function setPublishMode(matchId: string, mode: "REVIEWED" | "AUTO", threshold = 0.6) {
-  await requireAdmin();
+  await assertAdmin();
   mutate((db) => {
     const m = db.matches.find((x) => x.id === matchId);
     if (m) { m.publishMode = mode; m.autoThreshold = threshold; }
@@ -158,6 +124,7 @@ export async function setPublishMode(matchId: string, mode: "REVIEWED" | "AUTO",
 }
 
 export async function labelStats(matchId: string) {
+  await assertAdmin();
   const db = getDb();
   const ev = db.events.filter((e) => e.matchId === matchId);
   return {
