@@ -234,7 +234,9 @@
         "away": 9
       },
       "videoId": "video_tue5s",
-      "createdAt": "2026-09-14T10:00:00.000Z"
+      "createdAt": "2026-09-14T10:00:00.000Z",
+      "publishedAt": "2026-09-15T21:20:00.000Z",
+      "publishMode": "REVIEWED"
     },
     {
       "id": "match_thu5s",
@@ -261,7 +263,9 @@
         "away": 10
       },
       "videoId": "video_thu5s",
-      "createdAt": "2026-09-16T10:00:00.000Z"
+      "createdAt": "2026-09-16T10:00:00.000Z",
+      "publishedAt": "2026-09-17T21:15:00.000Z",
+      "publishMode": "REVIEWED"
     },
     {
       "id": "match_sun6s",
@@ -285,7 +289,8 @@
       },
       "score": null,
       "videoId": "video_sun6s",
-      "createdAt": "2026-09-20T10:00:00.000Z"
+      "createdAt": "2026-09-20T10:00:00.000Z",
+      "publishMode": "REVIEWED"
     }
   ],
   "matchPlayers": [
@@ -823,7 +828,12 @@
       "completedAt": "2026-09-23T09:02:50.550Z",
       "log": [
         "GENERATING_KLIPS started (REAL engine)",
-        "166 moments found"
+        "166 moments found",
+        "Rendering 38 KLIP files",
+        "10 KLIP files rendered",
+        "20 KLIP files rendered",
+        "30 KLIP files rendered",
+        "Clip rendering finished: 38 files"
       ]
     }
   ],
@@ -13920,9 +13930,9 @@
       "startTime": 1114,
       "endTime": 1129,
       "title": "Far post finish",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_g1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_g1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13933,9 +13943,9 @@
       "startTime": 1857,
       "endTime": 1872,
       "title": "First time strike",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_g2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_g2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13946,9 +13956,9 @@
       "startTime": 549,
       "endTime": 564,
       "title": "Cut back for James",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_a1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_a1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13959,9 +13969,9 @@
       "startTime": 265,
       "endTime": 280,
       "title": "Drag back and turn",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_s1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_s1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13972,9 +13982,9 @@
       "startTime": 882,
       "endTime": 897,
       "title": "Nutmeg on the wing",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_s2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_s2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13985,9 +13995,9 @@
       "startTime": 1564,
       "endTime": 1579,
       "title": "Beats two in the corner",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_s3.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_s3.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -13998,9 +14008,9 @@
       "startTime": 160,
       "endTime": 175,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_sh1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_sh1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14011,9 +14021,9 @@
       "startTime": 732,
       "endTime": 747,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_sh2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_sh2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14024,9 +14034,9 @@
       "startTime": 1343,
       "endTime": 1358,
       "title": "Off the bar",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_sh3.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_sh3.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14037,9 +14047,9 @@
       "startTime": 2136,
       "endTime": 2151,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_sh4.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_sh4.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14050,9 +14060,9 @@
       "startTime": 417,
       "endTime": 432,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_d1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_d1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14063,9 +14073,9 @@
       "startTime": 1712,
       "endTime": 1727,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_d2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_d2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14076,9 +14086,9 @@
       "startTime": 962,
       "endTime": 977,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_o1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_o1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14089,9 +14099,9 @@
       "startTime": 1871,
       "endTime": 1882,
       "title": "Knee slide",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_o2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_o2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14102,9 +14112,9 @@
       "startTime": 122,
       "endTime": 137,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14115,9 +14125,9 @@
       "startTime": 232,
       "endTime": 247,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14128,9 +14138,9 @@
       "startTime": 558,
       "endTime": 573,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og3.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og3.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14141,9 +14151,9 @@
       "startTime": 632,
       "endTime": 647,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og4.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og4.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14154,9 +14164,9 @@
       "startTime": 697,
       "endTime": 712,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og5.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og5.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14167,9 +14177,9 @@
       "startTime": 804,
       "endTime": 819,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og6.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og6.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14180,9 +14190,9 @@
       "startTime": 1002,
       "endTime": 1017,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og7.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og7.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14193,9 +14203,9 @@
       "startTime": 1172,
       "endTime": 1187,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og8.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og8.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14206,9 +14216,9 @@
       "startTime": 1257,
       "endTime": 1272,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og9.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og9.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14219,9 +14229,9 @@
       "startTime": 1392,
       "endTime": 1407,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og10.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og10.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14232,9 +14242,9 @@
       "startTime": 1472,
       "endTime": 1487,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og11.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og11.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14245,9 +14255,9 @@
       "startTime": 1602,
       "endTime": 1617,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og12.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og12.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14258,9 +14268,9 @@
       "startTime": 1682,
       "endTime": 1697,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og13.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og13.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14271,9 +14281,9 @@
       "startTime": 1782,
       "endTime": 1797,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og14.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og14.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14284,9 +14294,9 @@
       "startTime": 1942,
       "endTime": 1957,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og15.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og15.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14297,9 +14307,9 @@
       "startTime": 2032,
       "endTime": 2047,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og16.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og16.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14310,9 +14320,9 @@
       "startTime": 2202,
       "endTime": 2217,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og17.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og17.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14323,9 +14333,9 @@
       "startTime": 2252,
       "endTime": 2267,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og18.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og18.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14336,9 +14346,9 @@
       "startTime": 2312,
       "endTime": 2327,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_og19.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_og19.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14349,9 +14359,9 @@
       "startTime": 372,
       "endTime": 387,
       "title": "Point blank save",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_ox1.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_ox1.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14362,9 +14372,9 @@
       "startTime": 1522,
       "endTime": 1537,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_ox2.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_ox2.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14375,9 +14385,9 @@
       "startTime": 1292,
       "endTime": 1307,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_ox3.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_ox3.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14388,9 +14398,9 @@
       "startTime": 1997,
       "endTime": 2012,
       "title": "Air shot",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_ox4.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_ox4.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -14401,9 +14411,9 @@
       "startTime": 1097,
       "endTime": 1112,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_tue5s_ox5.mp4",
+      "thumbnailUrl": "/media/klips/klip_tue5s_ox5.jpg",
       "createdAt": "2026-09-15T21:20:00.000Z"
     },
     {
@@ -19367,5 +19377,6 @@
       "read": false,
       "createdAt": "2026-09-23T09:02:50.553Z"
     }
-  ]
+  ],
+  "authNonces": []
 }

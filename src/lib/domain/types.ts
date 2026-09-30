@@ -58,6 +58,8 @@ export interface User {
 
 export interface PlayerProfile {
   id: ID;
+  /** Booked-player email from the organiser roster. Sign-in with this email claims the profile. */
+  email?: string;
   userId: ID | null;
   displayName: string;
   handle: string;
@@ -129,6 +131,11 @@ export interface Match {
   score: { home: number; away: number } | null;
   videoId: ID | null;
   createdAt: string;
+  /** When players were given access to this game's KLIPs. Null = still being checked. */
+  publishedAt?: string | null;
+  /** REVIEWED: only human-approved moments reach players. AUTO: AI calls at or above autoThreshold go out unreviewed. */
+  publishMode?: "REVIEWED" | "AUTO";
+  autoThreshold?: number;
 }
 
 export interface MatchPlayer {
@@ -278,6 +285,31 @@ export interface Notification {
   createdAt: string;
 }
 
+export interface PushSubscriptionRecord {
+  id: ID;
+  userId: ID;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+/** A unit of work for an external processing worker (a Mac or GPU box running ai/worker.py). */
+export interface WorkerJob {
+  id: ID;
+  type: "PROCESS" | "RENDER";
+  matchId: ID;
+  status: "QUEUED" | "RUNNING" | "DONE" | "FAILED";
+  createdAt: string;
+  claimedAt?: string | null;
+  finishedAt?: string | null;
+  workerId?: string | null;
+  error?: string | null;
+  /** RENDER: klips to cut. */
+  klipIds?: ID[];
+}
+
 export interface Database {
   users: User[];
   playerProfiles: PlayerProfile[];
@@ -299,6 +331,10 @@ export interface Database {
   klipLikes: KlipLike[];
   klipShares: KlipShare[];
   notifications: Notification[];
+  /** Used one-time sign-in link ids, capped. */
+  authNonces?: Array<{ id: string; usedAt: string }>;
+  pushSubscriptions?: PushSubscriptionRecord[];
+  workerJobs?: WorkerJob[];
 }
 
 /* ---------- Presentation helpers (pure, no IO) ---------- */
@@ -364,6 +400,24 @@ export const STATUS_COPY: Record<MatchStatus, { title: string; detail: string }>
   READY: { title: "Your KLIPs are ready", detail: "Open your game to watch and share." },
   FAILED: { title: "Something went wrong", detail: "We couldn't process this game. Our team has been notified." },
 };
+
+/**
+ * The product's trust rule: what a player is allowed to see.
+ * Demo labels are always visible (seeded product demo). Everything else waits for the match
+ * to be published, or for AUTO mode. AI calls need a human "correct" unless AUTO mode
+ * lets confident, unreviewed calls through.
+ */
+export function eventVisibleToPlayers(event: MatchEvent, match: Match): boolean {
+  if (event.metadata.demo === true) return true;
+  const mode = match.publishMode ?? "REVIEWED";
+  const released = !!match.publishedAt || mode === "AUTO";
+  if (!released) return false;
+  if (event.source === "MANUAL") return true;
+  const review = event.metadata.review as string | undefined;
+  if (review === "correct") return true;
+  if (review) return false; // wrong / wrong_player / wrong_type
+  return mode === "AUTO" && event.confidence >= (match.autoThreshold ?? 0.6);
+}
 
 export function formatClock(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds));

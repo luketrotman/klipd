@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getMatchDetail, listAllEventsForMatch } from "@/lib/db/queries";
+import { getMatchDetail, getReviewSummary, listAllEventsForMatch } from "@/lib/db/queries";
+import PublishPanel from "@/components/admin/PublishPanel";
 import AdminShell from "@/components/AdminShell";
 import EventEditor from "@/components/admin/EventEditor";
 import { localCvAvailable } from "@/lib/ai/local";
+import { clipRenderStatus } from "@/lib/video/clips";
 import fs from "node:fs";
 import path from "node:path";
 import { formatKickoff } from "@/components/ui";
@@ -12,7 +14,7 @@ import Link from "next/link";
 export default async function AdminMatch({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
-  const detail = getMatchDetail(id);
+  const detail = getMatchDetail(id, null, "admin");
   if (!detail) notFound();
   const events = listAllEventsForMatch(id);
   const debugDir = path.join(process.cwd(), "ai", "debug");
@@ -30,8 +32,10 @@ export default async function AdminMatch({ params }: { params: Promise<{ id: str
           <Link href={`/matches/${detail.match.id}`} className="h-10 inline-flex items-center text-sm font-semibold text-muted hover:text-ink">View in app →</Link>
         </div>
       </div>
+      <div className="mb-6"><PublishPanel matchId={id} summary={getReviewSummary(id)} players={detail.roster.length} /></div>
       <EventEditor
         cvAvailable={localCvAvailable()}
+        clips={clipRenderStatus(id)}
         debugFrames={debugFrames}
         match={detail.match}
         video={detail.video}

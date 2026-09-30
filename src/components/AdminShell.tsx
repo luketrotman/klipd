@@ -10,6 +10,7 @@ export default function AdminShell({ children, title, back }: { children: React.
           <span className="text-sm text-muted truncate">{title}</span>
           <nav className="ml-auto flex gap-4 text-xs font-semibold text-muted">
             <Link href="/admin/matches" className="hover:text-ink">Matches</Link>
+            <Link href="/admin/players" className="hover:text-ink">Players</Link>
             <Link href="/home" className="hover:text-ink">App →</Link>
           </nav>
         </div>

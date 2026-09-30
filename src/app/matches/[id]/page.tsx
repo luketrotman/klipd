@@ -8,6 +8,7 @@ import { Avatar, formatKickoff } from "@/components/ui";
 import KlipFeed from "@/components/KlipFeed";
 import KlipGrid from "@/components/KlipGrid";
 import ProcessingStatus from "@/components/ProcessingStatus";
+import CheckingCard from "@/components/CheckingCard";
 import ClaimTrackedPlayer from "@/components/ClaimTrackedPlayer";
 
 type Tab = "highlights" | "players" | "goals" | "all";
@@ -22,6 +23,7 @@ export default async function MatchPage({ params, searchParams }: { params: Prom
   const k = formatKickoff(match.kickoffAt);
   const tab = (sp.tab as Tab) ?? "highlights";
   const me = viewer?.profile ?? null;
+  const ready = match.status === "READY" && detail.released;
 
   /* ---------- Player-filtered view: the post match experience ---------- */
   if (sp.player) {
@@ -72,7 +74,7 @@ export default async function MatchPage({ params, searchParams }: { params: Prom
             <span className="display text-4xl tabular-nums">{match.score ? `${match.score.home} – ${match.score.away}` : "vs"}</span>
             <span className="display text-2xl" style={{ color: match.awayTeam.colour }}>{match.awayTeam.name}</span>
           </div>
-          {onRoster && match.status === "READY" ? (
+          {onRoster && ready ? (
             <Link href={`/matches/${match.id}?player=${me!.id}`} className="mt-4 inline-flex h-11 items-center rounded-full bg-accent text-accent-ink px-5 text-sm font-semibold">Watch my KLIPs →</Link>
           ) : null}
         </section>
@@ -81,9 +83,13 @@ export default async function MatchPage({ params, searchParams }: { params: Prom
           <section className="px-4 mt-5">
             <ProcessingStatus status={match.status} engine={detail.jobs[0]?.engine ?? null} />
           </section>
+        ) : !detail.released ? (
+          <section className="px-4 mt-5">
+            <CheckingCard />
+          </section>
         ) : null}
 
-        {match.status === "READY" && tracked.length > 0 && onRoster ? (
+        {ready && tracked.length > 0 && onRoster ? (
           <section className="px-4 mt-5">
             <ClaimTrackedPlayer tracked={tracked} signedIn={!!me} alreadyLinked={myLinked} />
           </section>
@@ -99,7 +105,7 @@ export default async function MatchPage({ params, searchParams }: { params: Prom
         </nav>
 
         {tab === "highlights" ? (
-          match.status === "READY" ? <div className="flex flex-col h-[calc(100dvh-10.5rem)]"><KlipFeed cards={highlights.length ? highlights : klips} /></div> : <p className="px-4 py-10 text-sm text-muted text-center">Highlights appear once the game is processed.</p>
+          ready ? <div className="flex flex-col h-[calc(100dvh-10.5rem)]"><KlipFeed cards={highlights.length ? highlights : klips} /></div> : <p className="px-4 py-10 text-sm text-muted text-center">Highlights appear once the game is processed.</p>
         ) : null}
 
         {tab === "players" ? (

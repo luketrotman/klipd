@@ -1,35 +1,48 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb, mutate, newId, nowIso } from "@/lib/db/store";
-import { SESSION_COOKIE, getSessionUserId } from "@/lib/auth/session";
+import { SESSION_COOKIE, demoLoginEnabled, getSessionUserId, setSessionCookie } from "@/lib/auth/session";
+import { allowMagicRequest, appUrl, consumeMagicToken, issueMagicToken } from "@/lib/auth/magic";
+import { sendSignInEmail } from "@/lib/auth/email";
 
-async function setSession(userId: string) {
-  const jar = await cookies();
-  jar.set(SESSION_COOKIE, userId, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30 });
-}
-
+/** Development only: sign in as a seeded demo player. Disabled in production unless DEMO_LOGIN=1. */
 export async function signInAs(userId: string) {
+  if (!demoLoginEnabled()) redirect("/login");
   const user = getDb().users.find((u) => u.id === userId);
   if (!user) redirect("/login?error=unknown");
-  await setSession(userId);
+  await setSessionCookie(userId);
   const profile = getDb().playerProfiles.find((p) => p.userId === userId);
   redirect(profile ? "/home" : "/onboarding");
 }
 
-export async function signInWithEmail(formData: FormData) {
+export async function requestMagicLink(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!email || !email.includes("@")) redirect("/login?error=email");
-  let user = getDb().users.find((u) => u.email.toLowerCase() === email);
-  if (!user) {
-    user = mutate((db) => {
-      const u = { id: newId("user"), email, createdAt: nowIso() };
-      db.users.push(u);
-      return u;
-    });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) redirect("/login?error=email");
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  if (!allowMagicRequest(`${email}|${ip}`)) redirect("/login?error=rate");
+  const link = `${appUrl()}/auth/verify?token=${encodeURIComponent(issueMagicToken(email))}`;
+  let devLink: string | undefined;
+  try {
+    devLink = (await sendSignInEmail(email, link)).devLink;
+  } catch (e) {
+    console.error("[auth] sign-in email failed", e);
+    redirect("/login?error=send");
   }
-  await signInAs(user.id);
+  const jar = await cookies();
+  if (devLink) jar.set("klipd_devlink", devLink, { maxAge: 900, path: "/login", httpOnly: true, sameSite: "lax" });
+  redirect(`/login?sent=${encodeURIComponent(email)}`);
+}
+
+/** POST from the verify page (a button, so email-scanner prefetches cannot burn the link). */
+export async function consumeLink(formData: FormData) {
+  const token = String(formData.get("token") ?? "");
+  const r = consumeMagicToken(token);
+  if (!r.ok) redirect(`/login?error=${r.reason}`);
+  await setSessionCookie(r.user.id);
+  const profile = getDb().playerProfiles.find((p) => p.userId === r.user.id);
+  redirect(profile ? "/home" : "/onboarding");
 }
 
 export async function signOut() {
@@ -53,7 +66,6 @@ export async function completeOnboarding(formData: FormData) {
       existing.position = position;
       return;
     }
-    // A player may already exist on rosters (booked via an organiser) without an account: claim it.
     const claim = claimProfileId ? db.playerProfiles.find((p) => p.id === claimProfileId && !p.userId) : null;
     if (claim) {
       claim.userId = uid;
@@ -61,11 +73,12 @@ export async function completeOnboarding(formData: FormData) {
       claim.position = position;
       return;
     }
+    const email = db.users.find((u) => u.id === uid)?.email;
     const handleBase = displayName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "player";
     let handle = handleBase;
     let n = 1;
     while (db.playerProfiles.some((p) => p.handle === handle)) handle = `${handleBase}${++n}`;
-    db.playerProfiles.push({ id: newId("player"), userId: uid, displayName, handle, position, createdAt: nowIso() });
+    db.playerProfiles.push({ id: newId("player"), userId: uid, email, displayName, handle, position, createdAt: nowIso() });
   });
   redirect("/home");
 }

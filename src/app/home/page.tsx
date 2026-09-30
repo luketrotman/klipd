@@ -7,6 +7,7 @@ import { BottomNav, Page, TopBar } from "@/components/AppShell";
 import { Button, SectionTitle, StatRow, formatKickoff } from "@/components/ui";
 import KlipGrid from "@/components/KlipGrid";
 import ProcessingStatus from "@/components/ProcessingStatus";
+import CheckingCard from "@/components/CheckingCard";
 import { MatchRow } from "@/components/MatchRow";
 import { markNotificationsRead } from "@/app/actions/klips";
 
@@ -18,7 +19,7 @@ export default async function Home() {
 
   const matches = listMatches({ playerId: me.id });
   const latest = matches[0] ?? null;
-  const latestReady = matches.find((m) => m.match.status === "READY") ?? null;
+  const latestReady = matches.find((m) => m.match.status === "READY" && m.released) ?? null;
   const latestKlips = latestReady ? listKlipsForPlayer(me.id, { matchId: latestReady.match.id, viewerUserId: viewer.user.id }) : [];
   const counts = categoryCounts(latestKlips);
   const recent = listKlipsForPlayer(me.id, { limit: 6, viewerUserId: viewer.user.id });
@@ -43,6 +44,13 @@ export default async function Home() {
           <section className="px-4 pt-4">
             <Link href={`/matches/${latest.match.id}`} className="block">
               <ProcessingStatus status={latest.match.status} compact />
+            </Link>
+          </section>
+        ) : null}
+        {latest && latest.match.status === "READY" && !latest.released ? (
+          <section className="px-4 pt-4">
+            <Link href={`/matches/${latest.match.id}`} className="block">
+              <CheckingCard />
             </Link>
           </section>
         ) : null}

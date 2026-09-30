@@ -18,8 +18,11 @@ export default async function NewMatch() {
         <label className="flex flex-col gap-1 text-xs uppercase tracking-wider text-muted">Pitch<select name="pitchId" className={`${input} text-ink`}>{db.pitches.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.format})</option>)}</select></label>
         <label className="flex flex-col gap-1 text-xs uppercase tracking-wider text-muted">Format<select name="format" className={`${input} text-ink`}><option>5v5</option><option>6v6</option><option>7v7</option></select></label>
         <label className="flex flex-col gap-1 text-xs uppercase tracking-wider text-muted">Video URL (Vimeo)<input name="videoUrl" placeholder="https://vimeo.com/938101072" className={`${input} normal-case tracking-normal text-ink`} /></label>
+        <label className="md:col-span-2 flex flex-col gap-1 text-xs uppercase tracking-wider text-muted">Roster from the booking (one per line: Name, email, optional H or A for Blue or Orange)
+          <textarea name="roster" rows={5} placeholder={"Luke Trotman, luke@example.com, H\nJames Okafor, james@example.com, A"} className="rounded-xl bg-surface px-4 py-3 text-sm normal-case tracking-normal text-ink outline-none focus:ring-2 ring-accent" />
+        </label>
         <fieldset className="md:col-span-2">
-          <legend className="text-xs uppercase tracking-wider text-muted mb-2">Players (first half of the list → Blue, second half → Orange)</legend>
+          <legend className="text-xs uppercase tracking-wider text-muted mb-2">Or tick existing players (first half → Blue, second half → Orange)</legend>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
             {db.playerProfiles.map((p) => (
               <label key={p.id} className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 text-sm"><input type="checkbox" name="playerIds" value={p.id} className="accent-[#c8ff3d]" />{p.displayName}</label>

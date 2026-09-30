@@ -6,7 +6,8 @@ import { STATUS_COPY } from "@/lib/domain/types";
 export function MatchRow({ summary }: { summary: MatchSummary }) {
   const { match, venue, pitch, video } = summary;
   const k = formatKickoff(match.kickoffAt);
-  const ready = match.status === "READY";
+  const finished = match.status === "READY";
+  const ready = finished && summary.released;
   return (
     <Link href={`/matches/${match.id}`} className="flex gap-3 rounded-2xl bg-surface p-2.5 hover:bg-surface-2">
       <div className="relative w-28 aspect-video rounded-xl overflow-hidden bg-black shrink-0">
@@ -14,7 +15,7 @@ export function MatchRow({ summary }: { summary: MatchSummary }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={video.thumbnailUrl} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
         ) : null}
-        {!ready ? <span className="absolute inset-x-1 bottom-1 text-[9px] font-bold uppercase text-center bg-black/70 rounded px-1 py-0.5 text-accent">{STATUS_COPY[match.status].title}</span> : null}
+        {!ready ? <span className="absolute inset-x-1 bottom-1 text-[9px] font-bold uppercase text-center bg-black/70 rounded px-1 py-0.5 text-accent">{finished ? "Checking your KLIPs" : STATUS_COPY[match.status].title}</span> : null}
       </div>
       <div className="min-w-0 flex-1">
         <div className="display text-xl truncate">{match.title}</div>

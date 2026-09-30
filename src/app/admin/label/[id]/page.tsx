@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getMatchDetail, listAllEventsForMatch } from "@/lib/db/queries";
+import { getMatchDetail, getReviewSummary, listAllEventsForMatch } from "@/lib/db/queries";
+import PublishPanel from "@/components/admin/PublishPanel";
 import { labelStats } from "@/app/actions/label";
 import AdminShell from "@/components/AdminShell";
 import QuickLabeller, { type LabelEvent, type LabelRoster } from "@/components/admin/QuickLabeller";
@@ -9,7 +10,7 @@ import QuickLabeller, { type LabelEvent, type LabelRoster } from "@/components/a
 export default async function LabelPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
-  const detail = getMatchDetail(id);
+  const detail = getMatchDetail(id, null, "admin");
   if (!detail || !detail.video) notFound();
   const events: LabelEvent[] = listAllEventsForMatch(id).map(({ event, players }) => {
     const primary = players.find((p) => p.role === "PRIMARY");
@@ -30,6 +31,7 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
         </div>
         <Link href={`/admin/matches/${id}`} className="text-sm font-semibold text-muted hover:text-ink">Full editor →</Link>
       </div>
+      <div className="mb-4"><PublishPanel matchId={id} summary={getReviewSummary(id)} players={detail.roster.length} /></div>
       <QuickLabeller match={detail.match} video={detail.video} roster={roster} events={events} initialStats={stats} />
     </AdminShell>
   );

@@ -15,7 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: klipTitle(card),
     description: `${card.match.title} · ${card.venue.name} · KLIPD · Your game. Your moments.`,
-    openGraph: { title: klipTitle(card), images: card.video.thumbnailUrl ? [card.video.thumbnailUrl] : [], type: "video.other" },
+    openGraph: {
+      title: klipTitle(card),
+      images: (card.klip.thumbnailUrl ?? card.video.thumbnailUrl) ? [card.klip.thumbnailUrl ?? card.video.thumbnailUrl!] : [],
+      type: "video.other",
+      ...(card.klip.clipUrl ? { videos: [{ url: card.klip.clipUrl, type: "video/mp4", width: 1280, height: 720 }] } : {}),
+    },
   };
 }
 

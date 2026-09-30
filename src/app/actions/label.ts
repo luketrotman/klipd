@@ -98,6 +98,62 @@ export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, cor
   return twinId;
 }
 
+/** Release a game to its players: they get notified and can see approved moments. */
+export async function publishMatch(matchId: string) {
+  await requireAdmin();
+  const { eventVisibleToPlayers } = await import("@/lib/domain/types");
+  const { sendPushToUser } = await import("@/lib/push/server");
+  const targets = mutate((db) => {
+    const m = db.matches.find((x) => x.id === matchId);
+    if (!m) throw new Error("No match");
+    m.publishedAt = nowIso();
+    const visibleEvents = new Set(db.events.filter((e) => e.matchId === matchId && eventVisibleToPlayers(e, m)).map((e) => e.id));
+    const links = new Map(db.playerLinks.map((l) => [l.trackedPlayerId, l.playerId]));
+    const perPlayer = new Map<string, number>();
+    for (const ep of db.eventPlayers) {
+      if (!visibleEvents.has(ep.eventId) || ep.role !== "PRIMARY") continue;
+      const pid = ep.playerId ?? (ep.trackedPlayerId ? links.get(ep.trackedPlayerId) : null);
+      if (pid) perPlayer.set(pid, (perPlayer.get(pid) ?? 0) + 1);
+    }
+    const out: Array<{ userId: string; count: number }> = [];
+    for (const mp of db.matchPlayers.filter((x) => x.matchId === matchId)) {
+      const profile = db.playerProfiles.find((p) => p.id === mp.playerId);
+      if (!profile?.userId) continue;
+      const count = perPlayer.get(mp.playerId) ?? 0;
+      db.notifications.push({ id: newId("notif"), userId: profile.userId, type: "KLIPS_READY", title: count ? "Your KLIPs are ready" : "Your game is up", body: `${m.title} · ${count ? `${count} moments found` : "match highlights available"}`, matchId, read: false, createdAt: nowIso() });
+      out.push({ userId: profile.userId, count });
+    }
+    return out;
+  });
+  // Render MP4 files for everything players can now see (background; virtual clips play meanwhile).
+  const { renderKlipsForMatch, logToMatch, sourceFileFor } = await import("@/lib/video/clips");
+  const vid = getDb().videos.find((v) => v.matchId === matchId);
+  if (vid && sourceFileFor(vid)) void renderKlipsForMatch(matchId, { log: (msg) => logToMatch(matchId, msg) }).catch(() => {});
+  const db = getDb();
+  const m = db.matches.find((x) => x.id === matchId)!;
+  await Promise.all(targets.map((t) => sendPushToUser(t.userId, { title: t.count ? "Your KLIPs are ready" : "Your game is up", body: `${m.title} · ${t.count ? `${t.count} moments` : "highlights"}`, url: `/matches/${matchId}` }).catch(() => {})));
+  revalidatePath("/", "layout");
+  return targets.length;
+}
+
+export async function unpublishMatch(matchId: string) {
+  await requireAdmin();
+  mutate((db) => {
+    const m = db.matches.find((x) => x.id === matchId);
+    if (m) m.publishedAt = null;
+  });
+  revalidatePath("/", "layout");
+}
+
+export async function setPublishMode(matchId: string, mode: "REVIEWED" | "AUTO", threshold = 0.6) {
+  await requireAdmin();
+  mutate((db) => {
+    const m = db.matches.find((x) => x.id === matchId);
+    if (m) { m.publishMode = mode; m.autoThreshold = threshold; }
+  });
+  revalidatePath("/", "layout");
+}
+
 export async function labelStats(matchId: string) {
   const db = getDb();
   const ev = db.events.filter((e) => e.matchId === matchId);

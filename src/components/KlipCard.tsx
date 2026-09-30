@@ -14,7 +14,7 @@ export default function KlipCard({ card, active, full = false, loop = true, onEn
   return (
     <article className={`flex flex-col ${full ? "h-full justify-center" : ""}`}>
       <div className={full ? "" : "rounded-card overflow-hidden"}>
-        <KlipPlayer externalId={card.video.externalId} startTime={card.klip.startTime} endTime={card.klip.endTime} poster={card.video.thumbnailUrl} active={active} loop={loop} onEnded={onEnded} />
+        <KlipPlayer externalId={card.video.externalId} clipUrl={card.klip.clipUrl} startTime={card.klip.startTime} endTime={card.klip.endTime} poster={card.klip.thumbnailUrl ?? card.video.thumbnailUrl} active={active} loop={loop} onEnded={onEnded} />
       </div>
       <div className="px-4 pt-3 pb-2">
         <div className="flex items-center gap-2 mb-2">

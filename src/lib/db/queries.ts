@@ -4,8 +4,10 @@
  * client components directly.
  */
 import { getDb } from "./store";
+import { klipFileOk } from "../video/files";
 import {
   CATEGORY_OF,
+  eventVisibleToPlayers,
   type Database,
   type EventPlayerRole,
   type Klip,
@@ -88,8 +90,10 @@ function buildCard(db: Database, klip: Klip, viewerUserId: ID | null): KlipCardD
   const pitch = db.pitches.find((p) => p.id === match.pitchId) ?? null;
   const players = resolveEventPlayers(db, event.id);
   const primary = players.find((p) => p.role === "PRIMARY") ?? players[0] ?? null;
+  // Fall back to the source-video clip when the rendered file is not on this machine.
+  const usable: Klip = klipFileOk(klip) ? klip : { ...klip, clipUrl: null, thumbnailUrl: klip.status === "RENDERED" ? null : klip.thumbnailUrl };
   return {
-    klip,
+    klip: usable,
     event,
     match,
     venue,
@@ -112,18 +116,25 @@ function sortCards(cards: KlipCardData[]): KlipCardData[] {
   });
 }
 
-export function listKlipsForMatch(matchId: ID, viewerUserId?: ID | null): KlipCardData[] {
+export type Audience = "player" | "admin";
+
+function audienceFilter(audience: Audience) {
+  return (c: KlipCardData) => audience === "admin" || eventVisibleToPlayers(c.event, c.match);
+}
+
+export function listKlipsForMatch(matchId: ID, viewerUserId?: ID | null, audience: Audience = "player"): KlipCardData[] {
   const db = getDb();
   return db.klips
     .filter((k) => k.matchId === matchId)
     .map((k) => buildCard(db, k, viewerUserId ?? null))
     .filter((c): c is KlipCardData => !!c)
+    .filter(audienceFilter(audience))
     .sort((a, b) => a.klip.startTime - b.klip.startTime);
 }
 
 export function listKlipsForPlayer(
   playerId: ID,
-  opts: { matchId?: ID; category?: KlipCategory; viewerUserId?: ID | null; limit?: number } = {},
+  opts: { matchId?: ID; category?: KlipCategory; viewerUserId?: ID | null; limit?: number; audience?: Audience } = {},
 ): KlipCardData[] {
   const db = getDb();
   const cards = db.klips
@@ -131,6 +142,7 @@ export function listKlipsForPlayer(
     .filter((k) => eventInvolves(db, k.eventId, playerId))
     .map((k) => buildCard(db, k, opts.viewerUserId ?? null))
     .filter((c): c is KlipCardData => !!c)
+    .filter(audienceFilter(opts.audience ?? "player"))
     .filter((c) => !opts.category || c.category === opts.category);
   const sorted = sortCards(cards);
   return opts.limit ? sorted.slice(0, opts.limit) : sorted;
@@ -182,6 +194,8 @@ export interface MatchSummary {
   organiserName: string | null;
   playerCount: number;
   klipCount: number;
+  /** Players can see this game's moments (published, or AUTO mode). */
+  released: boolean;
 }
 
 function summarise(db: Database, match: Match): MatchSummary {
@@ -192,7 +206,8 @@ function summarise(db: Database, match: Match): MatchSummary {
     video: match.videoId ? db.videos.find((v) => v.id === match.videoId) ?? null : null,
     organiserName: match.organiserId ? db.organisers.find((o) => o.id === match.organiserId)?.name ?? null : null,
     playerCount: db.matchPlayers.filter((mp) => mp.matchId === match.id).length,
-    klipCount: db.klips.filter((k) => k.matchId === match.id).length,
+    klipCount: db.klips.filter((k) => k.matchId === match.id).filter((k) => { const e = db.events.find((x) => x.id === k.eventId); return e ? eventVisibleToPlayers(e, match) : false; }).length,
+    released: !!match.publishedAt || (match.publishMode ?? "REVIEWED") === "AUTO",
   };
 }
 
@@ -231,11 +246,11 @@ export interface MatchDetail extends MatchSummary {
   klips: KlipCardData[];
 }
 
-export function getMatchDetail(matchId: ID, viewerUserId?: ID | null): MatchDetail | null {
+export function getMatchDetail(matchId: ID, viewerUserId?: ID | null, audience: Audience = "player"): MatchDetail | null {
   const db = getDb();
   const match = db.matches.find((m) => m.id === matchId);
   if (!match) return null;
-  const klips = listKlipsForMatch(matchId, viewerUserId);
+  const klips = listKlipsForMatch(matchId, viewerUserId, audience);
   const roster: RosterEntry[] = db.matchPlayers
     .filter((mp) => mp.matchId === matchId)
     .map((mp) => {
@@ -296,4 +311,20 @@ export function listAllEventsForMatch(matchId: ID) {
       players: resolveEventPlayers(db, event.id),
       klip: db.klips.find((k) => k.eventId === event.id) ?? null,
     }));
+}
+
+export function getReviewSummary(matchId: ID) {
+  const db = getDb();
+  const match = db.matches.find((m) => m.id === matchId);
+  const ev = db.events.filter((e) => e.matchId === matchId);
+  const ai = ev.filter((e) => e.source === "AI");
+  return {
+    ai: ai.length,
+    reviewed: ai.filter((e) => e.metadata.review).length,
+    approved: ai.filter((e) => e.metadata.review === "correct").length,
+    manual: ev.filter((e) => e.source === "MANUAL" && !e.metadata.demo).length,
+    visibleToPlayers: match ? ev.filter((e) => eventVisibleToPlayers(e, match)).length : 0,
+    publishedAt: match?.publishedAt ?? null,
+    publishMode: match?.publishMode ?? "REVIEWED",
+  };
 }

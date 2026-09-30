@@ -11,19 +11,28 @@ import path from "node:path";
 import type { Database } from "../domain/types";
 import { buildSeed } from "./seed";
 
-const DB_PATH = path.join(process.cwd(), "data", "db.json");
+/** Where the database and secrets live. Set DATA_DIR to a persistent volume in production. */
+export const DATA_DIR = process.env.DATA_DIR ?? path.join(process.cwd(), "data");
+const DB_PATH = path.join(DATA_DIR, "db.json");
 
 type Cache = { db: Database | null };
 const g = globalThis as unknown as { __klipdDb?: Cache };
 if (!g.__klipdDb) g.__klipdDb = { db: null };
 const cache = g.__klipdDb;
 
+function normalise(db: Database): Database {
+  db.authNonces ??= [];
+  db.pushSubscriptions ??= [];
+  db.workerJobs ??= [];
+  return db;
+}
+
 function load(): Database {
   if (cache.db) return cache.db;
   if (fs.existsSync(DB_PATH)) {
-    cache.db = JSON.parse(fs.readFileSync(DB_PATH, "utf8")) as Database;
+    cache.db = normalise(JSON.parse(fs.readFileSync(DB_PATH, "utf8")) as Database);
   } else {
-    cache.db = buildSeed();
+    cache.db = normalise(buildSeed());
     persist(cache.db);
   }
   return cache.db;
@@ -48,7 +57,7 @@ export function mutate<T>(fn: (db: Database) => T): T {
 }
 
 export function resetDb(): void {
-  cache.db = buildSeed();
+  cache.db = normalise(buildSeed());
   persist(cache.db);
 }
 

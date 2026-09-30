@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type Player from "@vimeo/player";
-import { createKlipForEvent, deleteEvent, deleteKlip, saveEvent, setMatchScore, startProcessing, type EventInput } from "@/app/actions/admin";
+import { createKlipForEvent, deleteEvent, deleteKlip, saveEvent, setMatchScore, startClipRendering, startProcessing, type EventInput } from "@/app/actions/admin";
 import { linkTrackedPlayer, unlinkTrackedPlayer } from "@/app/actions/identity";
 import { CATEGORY_OF, EVENT_LABEL, EVENT_TYPES, MATCH_STATUSES, formatClock, type EventType, type Match, type Team, type Video, type MatchEvent, type Klip, type ProcessingJob } from "@/lib/domain/types";
 import type { ResolvedEventPlayer, TrackedEntry } from "@/lib/db/queries";
@@ -22,6 +22,7 @@ export interface EditorEvent {
 
 interface Props {
   cvAvailable: boolean;
+  clips: { total: number; rendered: number; sourceAvailable: boolean; ffmpeg: boolean };
   /** Annotated frames from the local CV run, named <video>_<n>_<TYPE>_<sec>s.jpg */
   debugFrames: string[];
   match: Match;
@@ -48,7 +49,7 @@ const emptyForm = (matchId: string): EventInput => ({
   createKlip: true,
 });
 
-export default function EventEditor({ cvAvailable, debugFrames, match, video, roster, tracked, events, jobs }: Props) {
+export default function EventEditor({ cvAvailable, clips, debugFrames, match, video, roster, tracked, events, jobs }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const frameFor = (ev: EditorEvent) => debugFrames.find((f) => f.includes(`_${ev.event.type}_${Math.floor(ev.event.timestamp)}s`)) ?? null;
   const router = useRouter();
@@ -349,6 +350,15 @@ export default function EventEditor({ cvAvailable, debugFrames, match, video, ro
           <p className="mt-2 text-[11px] text-muted">Real detection: YOLO + ByteTrack on the footage, run on this machine (about half the match length). Events are rule-based with confidences; correct them here. Manual labels are kept; previous machine output is replaced.</p>
           <button disabled={pending || !video} onClick={() => start(async () => { await startProcessing(match.id, "MOCK"); router.refresh(); })} className="mt-3 h-9 w-full rounded-full border border-orange text-orange text-xs font-bold disabled:opacity-40">
             {live ? "Restart MOCK pipeline" : "Run MOCK pipeline (placeholder data, no analysis)"}
+          </button>
+        </section>
+
+        <section className="rounded-2xl bg-surface p-4">
+          <h2 className="display text-2xl mb-1">KLIP files</h2>
+          <div className="text-sm">{clips.rendered} of {clips.total} rendered as MP4</div>
+          <p className="text-[11px] text-muted mt-1">{clips.sourceAvailable ? "Source footage is on this machine." : "Source footage not on this machine: download it to ai/videos/ first."}{!clips.ffmpeg ? " ffmpeg missing." : ""}</p>
+          <button disabled={pending || !clips.sourceAvailable || !clips.ffmpeg || clips.rendered >= clips.total} onClick={() => start(async () => { try { await startClipRendering(match.id); } catch (e) { setError(e instanceof Error ? e.message : String(e)); } router.refresh(); })} className="mt-3 h-10 w-full rounded-full border border-accent text-accent text-sm font-bold disabled:opacity-40">
+            Render {clips.total - clips.rendered} KLIP files
           </button>
         </section>
 

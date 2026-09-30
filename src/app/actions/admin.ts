@@ -9,6 +9,7 @@ import { LocalCvEngine, localCvAvailable } from "@/lib/ai/local";
 import { getVideoProvider } from "@/lib/video";
 import { VimeoVideoProvider } from "@/lib/video/vimeo";
 import { providerFor } from "@/lib/video";
+import { clipRenderStatus, logToMatch, renderKlipsForMatch } from "@/lib/video/clips";
 
 export interface EventInput {
   matchId: string;
@@ -121,7 +122,7 @@ export async function startProcessing(matchId: string, engineKey: "MOCK" | "LOCA
       debugFrames: 40,
       onLog: (stage, msg, progress) => appendJobLog(matchId, `${stage}: ${msg}${progress !== undefined ? ` (${Math.round(progress * 100)}%)` : ""}`),
     });
-    void runProcessingPipeline(matchId, { engine, stepDelayMs: 0 }).catch((err) => console.error("[pipeline]", err));
+    void runProcessingPipeline(matchId, { engine, stepDelayMs: 0, renderClips: true }).catch((err) => console.error("[pipeline]", err));
   } else {
     void runProcessingPipeline(matchId, { stepDelayMs: 2500 }).catch((err) => console.error("[pipeline]", err));
   }
@@ -140,6 +141,7 @@ export async function createMatch(formData: FormData) {
   const format = String(formData.get("format") ?? "5v5") as MatchFormat;
   const videoUrl = String(formData.get("videoUrl") ?? "").trim();
   const playerIds = formData.getAll("playerIds").map(String);
+  const pasted = await parseRoster(String(formData.get("roster") ?? ""));
   if (!title || !venueId || !pitchId || !kickoffAt) throw new Error("Missing fields");
 
   const vimeoId = videoUrl ? VimeoVideoProvider.parseExternalId(videoUrl) : null;
@@ -157,10 +159,21 @@ export async function createMatch(formData: FormData) {
     if (videoId && vimeoId) {
       db.videos.push({ id: videoId, matchId: id, provider: "vimeo", externalId: vimeoId, sourceUrl: `https://vimeo.com/${vimeoId}`, durationSeconds: meta?.durationSeconds ?? 0, thumbnailUrl: meta?.thumbnailUrl ?? null, width: meta?.width ?? null, height: meta?.height ?? null, cameraId: camera?.id ?? null, status: meta ? "AVAILABLE" : "PENDING" });
     }
-    const perTeam = Math.ceil(playerIds.length / 2);
-    playerIds.forEach((pid, i) => {
-      db.matchPlayers.push({ id: newId("mp"), matchId: id, playerId: pid, team: i < perTeam ? "HOME" : "AWAY", shirtNumber: (i % perTeam) + 1, source: "MANUAL" });
-    });
+    // Roster = ticked existing players + pasted lines (created or matched by email). Teams: explicit H/A, else split evenly.
+    const entries: Array<{ pid: string; team: Team | null }> = [
+      ...playerIds.map((pid) => ({ pid, team: null as Team | null })),
+      ...pasted.map((r) => ({ pid: upsertProfile(db, r), team: r.team })),
+    ].filter((e, i, arr) => arr.findIndex((x) => x.pid === e.pid) === i);
+    const unassigned = entries.filter((e) => !e.team);
+    const home = entries.filter((e) => e.team === "HOME").length, away = entries.filter((e) => e.team === "AWAY").length;
+    let toHome = Math.max(0, Math.ceil(entries.length / 2) - home);
+    for (const e of unassigned) { e.team = toHome > 0 ? "HOME" : "AWAY"; if (toHome > 0) toHome--; }
+    void away;
+    const counters = { HOME: 0, AWAY: 0 };
+    for (const e of entries) {
+      counters[e.team!]++;
+      db.matchPlayers.push({ id: newId("mp"), matchId: id, playerId: e.pid, team: e.team!, shirtNumber: counters[e.team!], source: "MANUAL" });
+    }
     return id;
   });
   revalidatePath("/", "layout");
@@ -187,4 +200,63 @@ export async function refreshVideoMetadata(videoId: string) {
     v.status = "AVAILABLE";
   });
   revalidatePath("/", "layout");
+}
+
+/** Render MP4 files (with watermark) for every KLIP of a match that is still virtual. Background. */
+export async function startClipRendering(matchId: string) {
+  const st = clipRenderStatus(matchId);
+  if (!st.sourceAvailable) throw new Error("Source footage is not on this machine (ai/videos/<id>.mp4)");
+  if (!st.ffmpeg) throw new Error("ffmpeg is not installed");
+  void renderKlipsForMatch(matchId, { log: (m) => logToMatch(matchId, m) }).catch((err) => logToMatch(matchId, `Rendering failed: ${err instanceof Error ? err.message : String(err)}`));
+  revalidatePath("/", "layout");
+}
+
+export async function getClipRenderStatus(matchId: string) {
+  return clipRenderStatus(matchId);
+}
+
+/* ---------------- roster / players ---------------- */
+
+export interface RosterLine { name: string; email: string | null; team: Team | null }
+
+/** Parse pasted roster text. One player per line: `Name, email, H|A` (email and team optional). */
+export async function parseRoster(text: string): Promise<RosterLine[]> {
+  return text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split(/[,\t;]/).map((x) => x.trim()).filter((x) => x !== "");
+      const email = parts.find((x) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x))?.toLowerCase() ?? null;
+      const teamRaw = parts.find((x) => /^(h|a|home|away|blue|orange)$/i.test(x))?.toLowerCase();
+      const team: Team | null = !teamRaw ? null : ["h", "home", "blue"].includes(teamRaw) ? "HOME" : "AWAY";
+      const name = parts.find((x) => x !== email && !/^(h|a|home|away|blue|orange)$/i.test(x)) ?? (email ? email.split("@")[0] : "");
+      return { name, email, team };
+    })
+    .filter((r) => r.name);
+}
+
+function upsertProfile(db: import("@/lib/domain/types").Database, r: RosterLine): string {
+  const byEmail = r.email ? db.playerProfiles.find((p) => p.email?.toLowerCase() === r.email) : null;
+  const byUserEmail = r.email ? db.users.find((u) => u.email.toLowerCase() === r.email) : null;
+  const existing = byEmail ?? (byUserEmail ? db.playerProfiles.find((p) => p.userId === byUserEmail.id) : null) ?? db.playerProfiles.find((p) => !r.email && p.displayName.toLowerCase() === r.name.toLowerCase());
+  if (existing) {
+    if (r.email && !existing.email) existing.email = r.email;
+    return existing.id;
+  }
+  const base = r.name.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "player";
+  let handle = base, n = 1;
+  while (db.playerProfiles.some((p) => p.handle === handle)) handle = `${base}${++n}`;
+  const id = newId("player");
+  const user = r.email ? db.users.find((u) => u.email.toLowerCase() === r.email) : null;
+  db.playerProfiles.push({ id, userId: user && !db.playerProfiles.some((p) => p.userId === user.id) ? user.id : null, email: r.email ?? undefined, displayName: r.name, handle, createdAt: nowIso() });
+  return id;
+}
+
+export async function addPlayers(formData: FormData) {
+  const lines = await parseRoster(String(formData.get("roster") ?? ""));
+  if (!lines.length) throw new Error("Add at least one player");
+  mutate((db) => { for (const r of lines) upsertProfile(db, r); });
+  revalidatePath("/admin/players");
+  redirect("/admin/players?added=" + lines.length);
 }

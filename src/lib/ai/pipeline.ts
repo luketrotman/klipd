@@ -12,6 +12,7 @@ import type { MatchStatus, PlayerLink, Team } from "../domain/types";
 import { providerFor } from "../video";
 import type { AiEngine } from "./services";
 import { createMockEngine } from "./mock";
+import { renderKlipsForMatch, sourceFileFor } from "../video/clips";
 
 const STAGES: MatchStatus[] = ["UPLOADED", "PROCESSING", "PLAYER_DETECTION", "PLAYER_TRACKING", "EVENT_DETECTION", "GENERATING_KLIPS"];
 
@@ -101,7 +102,7 @@ export function playersPerTeam(format: string): number {
   return format === "7v7" ? 7 : format === "6v6" ? 6 : 5;
 }
 
-export async function runProcessingPipeline(matchId: string, opts: { engine?: AiEngine; stepDelayMs?: number } = {}) {
+export async function runProcessingPipeline(matchId: string, opts: { engine?: AiEngine; stepDelayMs?: number; renderClips?: boolean } = {}) {
   const db = getDb();
   const match = db.matches.find((m) => m.id === matchId);
   const video = match?.videoId ? db.videos.find((v) => v.id === match.videoId) : null;
@@ -167,6 +168,15 @@ export async function runProcessingPipeline(matchId: string, opts: { engine?: Ai
         d.klips.push({ id: newId("klip"), matchId, eventId, videoId: video.id, startTime: c.startTime, endTime: c.endTime, title: c.title, status: rendered[i].status, clipUrl: rendered[i].clipUrl, thumbnailUrl: rendered[i].thumbnailUrl, createdAt: nowIso() });
       });
     });
+    if (opts.renderClips && sourceFileFor(video)) {
+      appendJobLog(matchId, "Rendering KLIP files with ffmpeg");
+      try {
+        const n = await renderKlipsForMatch(matchId, { log: (m) => appendJobLog(matchId, m) });
+        appendJobLog(matchId, `${n} KLIP files rendered`);
+      } catch (err) {
+        appendJobLog(matchId, `Clip rendering skipped: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
     await sleep(delay);
 
     setStage(matchId, "READY", engine.name);

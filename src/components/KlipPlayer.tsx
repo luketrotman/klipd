@@ -9,6 +9,8 @@ import type Player from "@vimeo/player";
  */
 export interface KlipPlayerProps {
   externalId: string;
+  /** Rendered MP4 (preferred over the Vimeo virtual clip when present). */
+  clipUrl?: string | null;
   startTime: number;
   endTime: number;
   poster?: string | null;
@@ -20,7 +22,58 @@ export interface KlipPlayerProps {
   className?: string;
 }
 
-export default function KlipPlayer({ externalId, startTime, endTime, poster, active, muted = true, loop = true, controls = false, onEnded, className = "" }: KlipPlayerProps) {
+export default function KlipPlayer(props: KlipPlayerProps) {
+  if (props.clipUrl) return <FileKlipPlayer {...props} clipUrl={props.clipUrl} />;
+  return <VimeoKlipPlayer {...props} />;
+}
+
+function FileKlipPlayer({ clipUrl, poster, active, muted = true, loop = true, onEnded, className = "" }: KlipPlayerProps & { clipUrl: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (active) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [active, clipUrl]);
+  return (
+    <div className={`relative bg-black overflow-hidden ${className}`}>
+      <div className="relative w-full aspect-video">
+        <video
+          ref={ref}
+          src={clipUrl}
+          poster={poster ?? undefined}
+          muted={muted}
+          loop={loop}
+          playsInline
+          preload={active ? "auto" : "metadata"}
+          className="absolute inset-0 w-full h-full object-cover"
+          onTimeUpdate={(e) => { const el = e.currentTarget; if (el.duration) setProgress(el.currentTime / el.duration); }}
+          onEnded={() => onEnded?.()}
+          onClick={(e) => { const el = e.currentTarget; if (el.paused) el.play().catch(() => {}); else el.pause(); }}
+        />
+        {!active ? (
+          <div className="absolute inset-0 grid place-items-center pointer-events-none">
+            <span className="w-14 h-14 rounded-full bg-white/15 backdrop-blur grid place-items-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z" /></svg>
+            </span>
+          </div>
+        ) : null}
+      </div>
+      {active ? (
+        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-white/15">
+          <div className="h-full bg-accent transition-[width] duration-200 ease-linear" style={{ width: `${progress * 100}%` }} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function VimeoKlipPlayer({ externalId, startTime, endTime, poster, active, muted = true, loop = true, controls = false, onEnded, className = "" }: KlipPlayerProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<Player | null>(null);
   const [ready, setReady] = useState(false);

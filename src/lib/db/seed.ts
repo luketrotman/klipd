@@ -75,7 +75,24 @@ function buildMoments(matchId: string, videoId: string, specs: MomentSpec[], cre
   return { events, eventPlayers, klips };
 }
 
-export function buildSeed(): Database {
+/** "demo": the three test matches, demo players and moments. "empty": reference data only (venues, pitches, cameras, providers). */
+export type SeedMode = "demo" | "empty";
+export function defaultSeedMode(): SeedMode {
+  if (process.env.SEED_MODE === "demo" || process.env.SEED_MODE === "empty") return process.env.SEED_MODE;
+  return process.env.NODE_ENV === "production" ? "empty" : "demo";
+}
+
+export function buildSeed(mode: SeedMode = defaultSeedMode()): Database {
+  const full = buildDemoSeed();
+  if (mode === "demo") return full;
+  return {
+    ...full,
+    users: [], playerProfiles: [], matches: [], matchPlayers: [], videos: [], processingJobs: [], trackedPlayers: [], playerLinks: [],
+    events: [], eventPlayers: [], klips: [], klipViews: [], klipLikes: [], klipShares: [], notifications: [],
+  };
+}
+
+function buildDemoSeed(): Database {
   const users = [
     { id: "user_luke", email: "luke@klipd.app", createdAt: T0, isAdmin: true },
     { id: "user_james", email: "james@klipd.app", createdAt: T0 },
@@ -268,6 +285,7 @@ export function buildSeed(): Database {
       score: { home: 12, away: 9 },
       videoId: v1,
       createdAt: "2026-09-14T10:00:00.000Z",
+      publishedAt: "2026-09-15T21:20:00.000Z",
     },
     {
       id: m2,
@@ -286,6 +304,7 @@ export function buildSeed(): Database {
       score: { home: 8, away: 10 },
       videoId: v2,
       createdAt: "2026-09-16T10:00:00.000Z",
+      publishedAt: "2026-09-17T21:15:00.000Z",
     },
     {
       id: m3,
