@@ -31,9 +31,11 @@ export function clipRenderStatus(matchId: string) {
 }
 
 const running = new Set<string>();
+const rerun = new Set<string>();
 
 export async function renderKlipsForMatch(matchId: string, opts: { onlyKlipIds?: string[]; concurrency?: number; log?: (msg: string) => void } = {}) {
-  if (running.has(matchId)) throw new Error("Clip rendering already running for this match");
+  // Already busy: remember to look again when done, so clips added meanwhile are not missed.
+  if (running.has(matchId)) { rerun.add(matchId); return 0; }
   running.add(matchId);
   try {
     const db = getDb();
@@ -83,6 +85,21 @@ export async function renderKlipsForMatch(matchId: string, opts: { onlyKlipIds?:
     return done;
   } finally {
     running.delete(matchId);
+    if (rerun.delete(matchId)) void renderKlipsForMatch(matchId, { log: opts.log }).catch(() => {});
+  }
+}
+
+/** Fire and forget: make sure every clip players can see has an MP4 (rendered here, or queued for a worker). */
+export function ensureClips(matchId: string): void {
+  void import("../worker/jobs").then((m) => m.renderOrQueue(matchId)).catch(() => {});
+}
+
+/** Run at server start: catch up on any visible clip that has no file yet. */
+export async function sweepRenders(): Promise<void> {
+  const { renderOrQueue } = await import("../worker/jobs");
+  for (const m of getDb().matches) {
+    const st = clipRenderStatus(m.id);
+    if (st.total > st.rendered) await renderOrQueue(m.id).catch(() => {});
   }
 }
 

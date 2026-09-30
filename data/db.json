@@ -677,7 +677,13 @@
       "completedAt": "2026-09-23T09:00:06.178Z",
       "log": [
         "GENERATING_KLIPS started (REAL engine)",
-        "165 moments found"
+        "165 moments found",
+        "Rendering 20 KLIP files",
+        "10 KLIP files rendered",
+        "20 KLIP files rendered",
+        "Clip rendering finished: 20 files",
+        "Rendering 1 KLIP files",
+        "Clip rendering finished: 1 files"
       ]
     },
     {
@@ -14360,9 +14366,9 @@
       "startTime": 1480,
       "endTime": 1495,
       "title": "Toe poke",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_g1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_g1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14373,9 +14379,9 @@
       "startTime": 310,
       "endTime": 325,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_a1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_a1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14386,9 +14392,9 @@
       "startTime": 1922,
       "endTime": 1937,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_a2.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_a2.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14399,9 +14405,9 @@
       "startTime": 647,
       "endTime": 662,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_s1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_s1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14412,9 +14418,9 @@
       "startTime": 202,
       "endTime": 217,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_sh1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_sh1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14425,9 +14431,9 @@
       "startTime": 1092,
       "endTime": 1107,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_sh2.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_sh2.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14438,9 +14444,9 @@
       "startTime": 2202,
       "endTime": 2217,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_d1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_d1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14451,9 +14457,9 @@
       "startTime": 832,
       "endTime": 847,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_d2.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_d2.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14464,9 +14470,9 @@
       "startTime": 1767,
       "endTime": 1782,
       "title": "Slips on the turn",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_o1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_o1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14477,9 +14483,9 @@
       "startTime": 318,
       "endTime": 333,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14490,9 +14496,9 @@
       "startTime": 512,
       "endTime": 527,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og2.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og2.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14503,9 +14509,9 @@
       "startTime": 752,
       "endTime": 767,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og3.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og3.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14516,9 +14522,9 @@
       "startTime": 982,
       "endTime": 997,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og4.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og4.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14529,9 +14535,9 @@
       "startTime": 1232,
       "endTime": 1247,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og5.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og5.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14542,9 +14548,9 @@
       "startTime": 1652,
       "endTime": 1667,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og6.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og6.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14555,9 +14561,9 @@
       "startTime": 1930,
       "endTime": 1945,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og7.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og7.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14568,9 +14574,9 @@
       "startTime": 2112,
       "endTime": 2127,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og8.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og8.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14581,9 +14587,9 @@
       "startTime": 2372,
       "endTime": 2387,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_og9.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_og9.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14594,9 +14600,9 @@
       "startTime": 1402,
       "endTime": 1417,
       "title": null,
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_ox1.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_ox1.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -14607,9 +14613,9 @@
       "startTime": 592,
       "endTime": 607,
       "title": "Rainbow flick",
-      "status": "VIRTUAL",
-      "clipUrl": null,
-      "thumbnailUrl": null,
+      "status": "RENDERED",
+      "clipUrl": "/media/klips/klip_thu5s_ox2.mp4",
+      "thumbnailUrl": "/media/klips/klip_thu5s_ox2.jpg",
       "createdAt": "2026-09-17T21:15:00.000Z"
     },
     {
@@ -19054,6 +19060,36 @@
       "klipId": "klip_tue5s_s2",
       "userId": null,
       "createdAt": "2026-09-16T08:00:00.000Z"
+    },
+    {
+      "id": "view_gav4ycs",
+      "klipId": "klip_tue5s_g1",
+      "userId": "user_luke",
+      "createdAt": "2026-09-30T12:27:39.329Z"
+    },
+    {
+      "id": "view_smyf3c7",
+      "klipId": "klip_tue5s_g1",
+      "userId": "user_luke",
+      "createdAt": "2026-09-30T12:27:40.462Z"
+    },
+    {
+      "id": "view_4ab4n48",
+      "klipId": "klip_thu5s_sh1",
+      "userId": "user_luke",
+      "createdAt": "2026-09-30T13:18:33.220Z"
+    },
+    {
+      "id": "view_fdy4tdv",
+      "klipId": "klip_thu5s_sh1",
+      "userId": null,
+      "createdAt": "2026-09-30T13:26:14.615Z"
+    },
+    {
+      "id": "view_5jkwhgv",
+      "klipId": "klip_thu5s_og2",
+      "userId": null,
+      "createdAt": "2026-09-30T13:26:30.485Z"
     }
   ],
   "klipLikes": [

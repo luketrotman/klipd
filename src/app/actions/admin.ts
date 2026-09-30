@@ -11,7 +11,7 @@ import { enqueueProcess, processingMode, renderOrQueue } from "@/lib/worker/jobs
 import { getVideoProvider } from "@/lib/video";
 import { VimeoVideoProvider } from "@/lib/video/vimeo";
 import { providerFor } from "@/lib/video";
-import { logToMatch } from "@/lib/video/clips";
+import { ensureClips, logToMatch } from "@/lib/video/clips";
 
 export interface EventInput {
   matchId: string;
@@ -60,6 +60,8 @@ export async function saveEvent(input: EventInput, eventId?: string) {
 
     const klip = db.klips.find((k) => k.eventId === evId);
     if (klip) {
+      // A different range makes any rendered file wrong: fall back to virtual until it is re-cut.
+      if (klip.startTime !== input.startTime || klip.endTime !== input.endTime) Object.assign(klip, { status: "VIRTUAL", clipUrl: null, thumbnailUrl: null });
       klip.startTime = input.startTime;
       klip.endTime = input.endTime;
       klip.title = input.title;
@@ -68,6 +70,7 @@ export async function saveEvent(input: EventInput, eventId?: string) {
     }
     return evId;
   });
+  ensureClips(input.matchId);
   revalidatePath("/", "layout");
   return id;
 }
@@ -100,11 +103,13 @@ export async function deleteKlip(klipId: string) {
 
 export async function createKlipForEvent(eventId: string) {
   await assertAdmin();
+  const forMatch = getDb().events.find((x) => x.id === eventId)?.matchId;
   mutate((db) => {
     const e = db.events.find((x) => x.id === eventId);
     if (!e || !e.videoId || db.klips.some((k) => k.eventId === eventId)) return;
     db.klips.push({ id: newId("klip"), matchId: e.matchId, eventId, videoId: e.videoId, startTime: e.startTime, endTime: e.endTime, title: (e.metadata.title as string) ?? null, status: "VIRTUAL", clipUrl: null, thumbnailUrl: null, createdAt: nowIso() });
   });
+  if (forMatch) ensureClips(forMatch);
   revalidatePath("/", "layout");
 }
 

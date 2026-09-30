@@ -77,6 +77,13 @@ place: publish gate (players only see approved moments), signed sessions with em
 web push, installable app (PWA), watermarked MP4 clips, and a worker API so the hosted app never needs
 a GPU. `.env.example` lists every setting.
 
+## Clips
+
+Every clip players can see is cut into a real MP4 (720p, KLIPD watermark) and played natively, which starts
+instantly. Clips are made automatically when a game is published, after each review or tag, after an edit,
+and by a sweep when the server starts. The Vimeo embed is only a fallback: jumping into a 40 minute stream
+takes several seconds, so the player says so and offers a retry. Files live in `data/media` (not in git).
+
 ## Security notes
 
 - Every exported server action is a public HTTP endpoint, even if no page links to it. All admin actions

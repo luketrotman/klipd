@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { assertAdmin } from "@/lib/auth/admin";
 import { getDb, mutate, newId, nowIso } from "@/lib/db/store";
+import { ensureClips } from "@/lib/video/clips";
 import { EVENT_TYPES, type EventType } from "@/lib/domain/types";
 import { linkTrackedPlayer } from "./identity";
 
@@ -39,6 +40,7 @@ export async function saveQuickLabel(input: QuickLabelInput) {
     if (match.videoId) db.klips.push({ id: newId("klip"), matchId: match.id, eventId: evId, videoId: match.videoId, startTime: Math.max(0, t - lead), endTime: t + tail, title: null, status: "VIRTUAL", clipUrl: null, thumbnailUrl: null, createdAt: nowIso() });
     return evId;
   });
+  ensureClips(input.matchId);
   revalidatePath("/", "layout");
   return id;
 }
@@ -73,6 +75,7 @@ export type ReviewVerdict = "correct" | "wrong" | "wrong_player" | "wrong_type";
  */
 export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, correction: { trackedPlayerId?: string | null; playerId?: string | null; type?: EventType } = {}) {
   await assertAdmin();
+  const reviewed = getDb().events.find((x) => x.id === eventId);
   const twinId = mutate((db) => {
     const e = db.events.find((x) => x.id === eventId);
     if (!e) throw new Error("No event");
@@ -92,6 +95,7 @@ export async function reviewAiEvent(eventId: string, verdict: ReviewVerdict, cor
     if (src) db.klips.push({ id: newId("klip"), matchId: e.matchId, eventId: twin, videoId: src.videoId, startTime: src.startTime, endTime: src.endTime, title: null, status: src.status, clipUrl: src.clipUrl, thumbnailUrl: src.thumbnailUrl, createdAt: nowIso() });
     return twin;
   });
+  if (twinId && reviewed) ensureClips(reviewed.matchId);
   revalidatePath("/", "layout");
   return twinId;
 }
